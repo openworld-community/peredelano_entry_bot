@@ -1,3 +1,5 @@
+import asyncio
+import sys
 from datetime import datetime
 
 import pytz
@@ -5,6 +7,11 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
 from dependencies import sb
+
+
+def check_eventloop_policy():
+    if sys.platform == 'win32':
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
 async def upsert_userdata(col: str, val: str) -> None:

@@ -4,15 +4,12 @@ import sys
 
 import common_handlers
 from dependencies import dp, bot
+from misc import check_eventloop_policy
 
-asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
-
+check_eventloop_policy()
 
 
 async def main():
-    # Регистриуем роутеры в диспетчере
-    # dp.include_router(dev_handlers.dev_router)
     dp.include_router(common_handlers.form_router)
 
     await dp.start_polling(bot)
