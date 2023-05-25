@@ -19,7 +19,7 @@ from misc import collect_initial_data_from_user
 async def command_start(message: Message, state: FSMContext) -> None:
     await collect_initial_data_from_user(message, state)
     await state.set_state(CommonForm.role)
-    kb_builder: KeyboardBuilder[ButtonType] = await create_buttons(["Создать профиль"])
+    kb_builder = await create_buttons(["Создать профиль"])
     await message.answer(text=RU_COMMON_HANDLERS['command_start'],
                          reply_markup=kb_builder.as_markup(resize_keyboard=True), )
 
@@ -41,17 +41,10 @@ async def cancel_handler(message: Message, state: FSMContext) -> None:
 @form_router.message(CommonForm.role, F.text.casefold() == "создать профиль")
 async def get_role(message: Message, state: FSMContext) -> None:
     await state.set_state(CommonForm.experience)
-    kb_builder: KeyboardBuilder[ButtonType] = await create_buttons(RU_COMMON_HANDLERS['roles'], width=3)
+    kb_builder = await create_buttons(RU_COMMON_HANDLERS['roles'], width=3)
     await message.answer(
         text=RU_COMMON_HANDLERS['get_specialization'],
         reply_markup=kb_builder.as_markup(resize_keyboard=True), )
-
-
-# РОЛЬ ДРУГОЕ
-@form_router.message(CommonForm.experience, F.text.casefold() == "другое")
-async def get_role_other(message: Message, state: FSMContext) -> None:
-    await state.set_state(CommonForm.experience)
-    await message.answer('Напиши свою роль', reply_markup=ReplyKeyboardRemove())
 
 
 # ОПЫТ
@@ -59,15 +52,14 @@ async def get_role_other(message: Message, state: FSMContext) -> None:
 async def indicate_experience(message: Message, state: FSMContext) -> None:
     await state.set_state(CommonForm.tech_stack)
     await state.update_data(role=message.text)
-    kb_builder: KeyboardBuilder[ButtonType] = await create_buttons(["До года", "1-3 года", "3-5 лет",
-                                                                    "Свыше 5 лет", "Не работаю"], width=3)
+    kb_builder = await create_buttons(RU_COMMON_HANDLERS['choose_experience'], width=3)
     await message.answer(
         text=RU_COMMON_HANDLERS['check_experience'],
         reply_markup=kb_builder.as_markup(resize_keyboard=True), )
 
 
 # СТЕК
-@form_router.message(CommonForm.tech_stack)
+@form_router.message(CommonForm.tech_stack, F.text.in_({*RU_COMMON_HANDLERS['choose_experience']}))
 async def choose_tech_stack(message: Message, state: FSMContext) -> None:
     await state.set_state(CommonForm.summary)
     await state.update_data(experience=message.text)
@@ -80,12 +72,12 @@ async def choose_tech_stack(message: Message, state: FSMContext) -> None:
 async def get_summary(message: Message, state: FSMContext) -> None:
     await state.set_state(CommonForm.telegram_link)
     await state.update_data(tech_stack=message.text)
-    data: dict[str, str | int] = await state.get_data()
-    kb_builder: KeyboardBuilder[ButtonType] = await create_buttons(["Подтвердить", "Отмена"])
+    data = await state.get_data()
+    kb_builder = await create_buttons(["Подтвердить", "Отмена"])
     await show_dev_summary(data, kb_builder, message)
 
 
-async def show_dev_summary(data: dict, kb_builder, message) -> None:
+async def show_dev_summary(data: dict, kb_builder: KeyboardBuilder[ButtonType], message) -> None:
     await message.answer(
         text=f'{RU_COMMON_HANDLERS["summary"]}'
 
@@ -100,8 +92,7 @@ async def finish(message: Message, state: FSMContext) -> None:
     await message.answer('Спасибо, что заполнил профиль!', reply_markup=ReplyKeyboardRemove())
     await state.update_data(submit='yes')
 
-    kb_builder: KeyboardBuilder[ButtonType] = await create_url_button("Peredelano Startups",
-                                                                      "https://t.me/peredelanoconfjunior")
+    kb_builder = await create_url_button("Peredelano Startups", "https://t.me/peredelanoconfjunior")
     await message.answer("Вот ссылка на наш Telegram-канал",
                          reply_markup=kb_builder.as_markup(resize_keyboard=True), )
     await upsert_final_data_to_db(state)
@@ -127,7 +118,7 @@ async def upsert_final_data_to_db(state: FSMContext) -> None:
     sb.table('users').upsert(data, on_conflict='tg_id').execute()
 
 
-async def calc_total_time(data):
+async def calc_total_time(data: dict) -> int:
     start_time = data.get("start_time", 0)
     end_time = int(time.time())
     return end_time - start_time
