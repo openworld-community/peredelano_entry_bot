@@ -1,4 +1,5 @@
 import logging
+import time
 
 from aiogram import F
 from aiogram.filters import Command
@@ -114,14 +115,22 @@ async def upsert_final_data_to_db(state: FSMContext) -> None:
     experience = data.get("experience", "Данные не получены")
     tech_stack = data.get("tech_stack", "Данные не получены")
     submit = data.get("submit", "No")
+    total_time = await calc_total_time(data)
 
     data = {"tg_id": tg_id,
             'role': role,
             'experience': experience,
             'tech_stack': tech_stack,
-            'submit': submit}
+            'submit': submit,
+            'total_time_in_sec': total_time}
 
     sb.table('users').upsert(data, on_conflict='tg_id').execute()
+
+
+async def calc_total_time(data):
+    start_time = data.get("start_time", 0)
+    end_time = int(time.time())
+    return end_time - start_time
 
 
 @form_router.message()

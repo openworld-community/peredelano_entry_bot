@@ -1,5 +1,6 @@
 import asyncio
 import sys
+import time
 from datetime import datetime
 
 import pytz
@@ -20,9 +21,10 @@ async def upsert_userdata(col: str, val: str) -> None:
 
 
 async def collect_initial_data_from_user(message: Message, state: FSMContext) -> None:
-    timestamptz = await get_timstamptz()
+    timestamptz, start_time = await get_datetime()
     fullname, tg_id, username = await get_userdata(message)
-    await state.update_data(tg_id=tg_id, username=username, fullname=fullname, date=timestamptz)
+    await state.update_data(tg_id=tg_id, username=username, fullname=fullname,
+                            date=timestamptz, start_time=start_time)
     await upsert_initial_data_to_db(fullname, tg_id, timestamptz, username)
 
 
@@ -38,11 +40,12 @@ async def get_userdata(message):
     return fullname, tg_id, username
 
 
-async def get_timstamptz():
+async def get_datetime():
     now = datetime.now()
     timestamptz = now.astimezone(pytz.timezone('UTC'))
     timestamptz = timestamptz.strftime("%Y-%m-%d %H:%M:%S %Z")
-    return timestamptz
+    start_time = int(time.time())
+    return timestamptz, start_time
 
 
 def check_string(input_string):
