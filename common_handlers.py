@@ -87,7 +87,8 @@ async def show_dev_summary(data: dict, kb_builder: KeyboardBuilder[ButtonType], 
         reply_markup=kb_builder.as_markup(resize_keyboard=True), )
 
 
-@form_router.message(CommonForm.telegram_link)
+# ССЫЛКА НА КАНАЛ
+@form_router.message(CommonForm.telegram_link, F.text.casefold() == "подтвердить")
 async def finish(message: Message, state: FSMContext) -> None:
     await message.answer('Спасибо, что заполнил профиль!', reply_markup=ReplyKeyboardRemove())
     await state.update_data(submit='yes')
