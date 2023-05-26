@@ -1,17 +1,15 @@
 import logging
-import time
 
 from aiogram import F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
-from aiogram.utils.keyboard import KeyboardBuilder, ButtonType
 
 from buttons_factory import create_buttons, create_url_button
-from dependencies import form_router, sb
+from dependencies import form_router
 from fsm import CommonForm
 from lang_ru import RU_COMMON_HANDLERS
-from misc import collect_initial_data_from_user
+from misc import collect_initial_data_from_user, upsert_final_data_to_db, show_dev_summary
 
 
 # START
@@ -77,16 +75,6 @@ async def get_summary(message: Message, state: FSMContext) -> None:
     await show_dev_summary(data, kb_builder, message)
 
 
-async def show_dev_summary(data: dict, kb_builder: KeyboardBuilder[ButtonType], message) -> None:
-    await message.answer(
-        text=f'{RU_COMMON_HANDLERS["summary"]}'
-
-             f'Роль: {data.get("role", "Данные не получены")}\n'
-             f'Опыт: {data.get("experience", "Данные не получены")}\n'
-             f'Стек: {data.get("tech_stack", "Данные не получены")}',
-        reply_markup=kb_builder.as_markup(resize_keyboard=True), )
-
-
 # ССЫЛКА НА КАНАЛ
 @form_router.message(CommonForm.telegram_link, F.text.casefold() == "подтвердить")
 async def finish(message: Message, state: FSMContext) -> None:
@@ -100,31 +88,7 @@ async def finish(message: Message, state: FSMContext) -> None:
     await state.clear()
 
 
-async def upsert_final_data_to_db(state: FSMContext) -> None:
-    data: dict[str, int | str] = await state.get_data()
-    tg_id = data.get("tg_id", "Данные не получены")
-    role = data.get("role", "Данные не получены")
-    experience = data.get("experience", "Данные не получены")
-    tech_stack = data.get("tech_stack", "Данные не получены")
-    submit = data.get("submit", "No")
-    total_time = await calc_total_time(data)
-
-    data = {"tg_id": tg_id,
-            'role': role,
-            'experience': experience,
-            'tech_stack': tech_stack,
-            'submit': submit,
-            'total_time_in_sec': total_time}
-
-    sb.table('users').upsert(data, on_conflict='tg_id').execute()
-
-
-async def calc_total_time(data: dict) -> int:
-    start_time = data.get("start_time", 0)
-    end_time = int(time.time())
-    return end_time - start_time
-
-
+# СООБЩЕНИЕ О НЕПРАВИЛЬНОМ ДЕЙСТВИИ
 @form_router.message()
 async def wrong_message(message: Message) -> None:
     await message.reply(text=RU_COMMON_HANDLERS['wrong_answer'])
