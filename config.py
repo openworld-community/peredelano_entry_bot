@@ -28,5 +28,5 @@ def load_config(path: str | None = None) -> Config:
                   )
 
 
-config: Config = load_config('.env_dev') if PROJECT_STATUS.lower() == 'test' else load_config()
+config: Config = load_config('secrets/.env_dev') if PROJECT_STATUS.lower() == 'test' else load_config('secrets/.env')
 DB_TABLE = config.tg_bot.supabase_table
