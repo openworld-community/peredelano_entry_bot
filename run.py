@@ -2,7 +2,7 @@ import asyncio
 import logging
 import sys
 
-from hanglers import common_handlers
+from handlers import common_handlers
 from dependencies import dp, bot
 from utils.misc import check_eventloop_policy
 
