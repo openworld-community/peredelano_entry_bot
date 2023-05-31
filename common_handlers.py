@@ -6,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
 
 from buttons_factory import create_buttons, create_url_button
+from config import DB_TABLE
 from dependencies import form_router
 from fsm import CommonForm
 from lang_ru import RU_COMMON_HANDLERS
@@ -84,7 +85,7 @@ async def finish(message: Message, state: FSMContext) -> None:
     kb_builder = await create_url_button("Peredelano Startups", "https://t.me/peredelanoconfjunior")
     await message.answer("Вот ссылка на наш Telegram-канал",
                          reply_markup=kb_builder.as_markup(resize_keyboard=True), )
-    await upsert_final_data_to_db(state)
+    await upsert_final_data_to_db(state, DB_TABLE)
     await state.clear()
 
 

@@ -1,9 +1,7 @@
 from aiogram import Router, Bot, Dispatcher
 from supabase import Client, create_client
 
-from config import Config, load_config
-
-config: Config = load_config()
+from config import config
 
 dev_router: Router = Router()
 form_router: Router = Router()
