@@ -3,8 +3,8 @@ from aiogram.types import Message
 from loguru import logger
 
 from config import USERS_TABLE, MAILING_TABLE
-from dependencies import sb
-from utils.misc import calc_total_time, get_datetime, get_userdata
+from bot.dependencies import sb
+from bot.utils.misc import calc_total_time, get_datetime, get_userdata
 
 
 async def upsert_final_data_to_db(state: FSMContext, db_table: str) -> None:

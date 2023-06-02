@@ -1,5 +1,5 @@
-secrets/.env
-secrets/.env_dev
+bot/secrets/.env
+bot/secrets/.env_dev
 .mypy_cache/
 .vscode/
 venv/

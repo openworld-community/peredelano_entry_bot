@@ -4,12 +4,12 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
 
 from config import config
-from db.database import get_all_tg_ids, insert_mailing_message_to_db
-from dependencies import admin_router
-from fsm import Admin
-from lang_ru import RU_ADMIN_HANDLERS
-from utils.buttons_factory import create_buttons
-from utils.mailing_list import select_profiles_for_mailing, start_mailing, mailing_list_summary, \
+from bot.db.database import get_all_tg_ids, insert_mailing_message_to_db
+from bot.dependencies import admin_router
+from bot.fsm import Admin
+from bot.lang_ru import RU_ADMIN_HANDLERS
+from bot.utils.buttons_factory import create_buttons
+from bot.utils.mailing_list import select_profiles_for_mailing, start_mailing, mailing_list_summary, \
     show_mailing_summary
 
 

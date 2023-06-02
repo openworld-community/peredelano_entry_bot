@@ -6,7 +6,7 @@ from datetime import datetime
 import pytz
 from aiogram.utils.keyboard import KeyboardBuilder, ButtonType
 
-from lang_ru import RU_COMMON_HANDLERS
+from bot.lang_ru import RU_COMMON_HANDLERS
 
 
 def check_eventloop_policy() -> None:

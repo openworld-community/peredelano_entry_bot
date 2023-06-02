@@ -2,9 +2,10 @@ import asyncio
 import logging
 import sys
 
-from handlers import common_handlers, admin_handlers
-from dependencies import dp, bot
-from utils.misc import check_eventloop_policy
+from bot.handlers import admin_handlers
+from bot.handlers import common_handlers
+from bot.dependencies import dp, bot
+from bot.utils.misc import check_eventloop_policy
 
 check_eventloop_policy()
 

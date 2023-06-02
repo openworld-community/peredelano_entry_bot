@@ -4,9 +4,9 @@ from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.utils.keyboard import KeyboardBuilder, ButtonType
 from loguru import logger
 
-from dependencies import bot
-from error_handling.exceptions import BotBlocked
-from lang_ru import RU_ADMIN_HANDLERS
+from bot.dependencies import bot
+from bot.error_handling.exceptions import BotBlocked
+from bot.lang_ru import RU_ADMIN_HANDLERS
 
 
 async def show_mailing_summary(data: dict, kb_builder: KeyboardBuilder[ButtonType], message) -> None:

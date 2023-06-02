@@ -5,13 +5,13 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
 
-from utils.buttons_factory import create_buttons, create_url_button
+from bot.utils.buttons_factory import create_buttons, create_url_button
 from config import USERS_TABLE
-from db.database import upsert_final_data_to_db, collect_initial_data_from_user
-from dependencies import form_router
-from fsm import CommonForm
-from lang_ru import RU_COMMON_HANDLERS
-from utils.misc import show_dev_summary
+from bot.db.database import upsert_final_data_to_db, collect_initial_data_from_user
+from bot.dependencies import form_router
+from bot.fsm import CommonForm
+from bot.lang_ru import RU_COMMON_HANDLERS
+from bot.utils.misc import show_dev_summary
 
 
 # START
