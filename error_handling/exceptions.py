@@ -1,0 +1,2 @@
+class BotBlocked(Exception):
+    pass

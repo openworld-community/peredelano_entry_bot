@@ -3,7 +3,7 @@ from supabase import Client, create_client
 
 from config import config
 
-dev_router: Router = Router()
+admin_router: Router = Router()
 form_router: Router = Router()
 
 bot: Bot = Bot(token=config.tg_bot.bot_token, parse_mode="HTML")
