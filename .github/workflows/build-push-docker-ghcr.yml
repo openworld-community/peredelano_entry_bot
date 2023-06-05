@@ -50,6 +50,7 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           context: ./
           file: ./Dockerfile
+          target: release
           tags: "${{ env.IMAGE_TAG }}"
           push: true
           cache-from: type=registry,ref=${{ env.CACHE_IMAGE_TAG }}
