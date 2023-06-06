@@ -1,0 +1,67 @@
+name: Deployment
+
+concurrency:
+  group: production
+  cancel-in-progress: true
+
+on:
+#  push:
+#    branches:
+#      - master
+  pull_request:
+    types: ['opened', 'edited', 'reopened', 'synchronize']
+    branches:
+      - master
+  workflow_dispatch:
+
+
+jobs:
+
+  lint:
+    runs-on: ubuntu-latest
+    name: Check code syntax
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Lint Code Base
+        uses: github/super-linter@v4
+        env:
+          DISABLE_ERRORS: false
+          LOG_LEVEL: WARN
+          VALIDATE_ALL_CODEBASE: true
+          IGNORE_GITIGNORED_FILES: true
+          VALIDATE_GITLEAKS: true
+          VALIDATE_DOCKERFILE_HADOLINT: true
+          VALIDATE_PYTHON: true
+          VALIDATE_YAML: true
+          VALIDATE_MARKDOWN: true
+          VALIDATE_GITHUB_ACTIONS: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deployment:
+    needs: lint
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Run command on remote server
+        uses: D3rHase/ssh-command-action@v0.2.2
+        with:
+          host: ${{secrets.SSH_HOST}}
+          user: ${{secrets.SSH_USER}}
+          private_key: ${{secrets.SSH_PRIVATE_KEY}}
+          command: |
+                 cd ${{secrets.APP_DIR}};
+                 git checkout master;
+                 git pull;
+                 echo "${{secrets.ENV_PRODUCTION}}" > ./secrets/.env
+                 docker build -t peredelanobot .
+                 docker stop peredelanobot
+                 docker run -d --name peredelanobot --rm peredelanobot
+                 #docker-compose --file docker-compose.yml down --remove-orphans;
+                 #docker-compose --file docker-compose.yml up -d --build;
+                 #docker system prune --all --force;
