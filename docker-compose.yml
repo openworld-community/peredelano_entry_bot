@@ -1,0 +1,15 @@
+version: '3.5'
+
+services:
+
+  peredelano_entry_bot:
+    container_name: peredelano_entry_bot
+#    env_file:
+#      - secrets/.env
+    image: peredelano_entry_bot:latest
+#    image: ghcr.io/openworld-community/ows-events/peredelano_entry_bot:latest
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      target: release
+    restart: on-failure
