@@ -7,7 +7,7 @@ services:
 #    env_file:
 #      - secrets/.env
     image: peredelano_entry_bot:latest
-#    image: ghcr.io/openworld-community/ows-events/peredelano_entry_bot:latest
+#    image: ghcr.io/openworld-community/peredelano_entry_bot/peredelano_entry_bot:latest
     build:
       context: ./
       dockerfile: Dockerfile
