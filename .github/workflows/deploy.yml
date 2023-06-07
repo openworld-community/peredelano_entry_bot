@@ -5,9 +5,10 @@ concurrency:
   cancel-in-progress: true
 
 on:
-#  push:
-#    branches:
+  push:
+    branches:
 #      - master
+       - spr0sto
   pull_request:
     types: ['opened', 'edited', 'reopened', 'synchronize']
     branches:
