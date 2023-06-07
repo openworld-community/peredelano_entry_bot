@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from environs import Env
 
-PROJECT_STATUS = 'test'
+PROJECT_STATUS = 'prod'
 
 
 @dataclass
