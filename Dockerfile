@@ -12,10 +12,10 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-RUN pip install --upgrade pip \
+# hadolint ignore=DL3013
+RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir --requirement requirements.txt; \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
+       apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY . .
 

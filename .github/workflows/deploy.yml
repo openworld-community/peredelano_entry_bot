@@ -65,11 +65,12 @@ jobs:
 
       - name: 'Export lowercase image names'
         shell: bash
+        # shellcheck disable=2086
         run: |
           : "${{ env.REGISTRY }}/${{ github.repository }}:latest"
-          echo "IMAGE_TAG=${_,,}" | tee -a $GITHUB_ENV
+          echo "IMAGE_TAG=${_,,}" | tee -a "$GITHUB_ENV"
           : "${{ env.REGISTRY }}/${{ github.repository }}/${{ env.CACHE_IMAGE_NAME }}:latest"
-          echo "CACHE_IMAGE_TAG=${_,,}" | tee -a $GITHUB_ENV
+          echo "CACHE_IMAGE_TAG=${_,,}" | tee -a "$GITHUB_ENV"
 
       - name: 'Login to GHCR'
         uses: docker/login-action@v2
