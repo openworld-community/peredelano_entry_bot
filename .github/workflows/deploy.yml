@@ -9,6 +9,10 @@ on:
     branches:
       - master
       - spr0sto
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize]
   workflow_dispatch:
 
 permissions:
@@ -29,12 +33,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set all code validation flage
+        if: github.ref == ${{ github.event.repository.default_branch }}
+        run: echo "VALIDATE_ALL_CODEBASE=true" >> "$GITHUB_ENV"
+
+      - name: Set only difference of code validation at default branch
+        if: github.ref != ${{ github.event.repository.default_branch }}
+        run: echo "VALIDATE_ALL_CODEBASE=false" >> "$GITHUB_ENV"
+
       - name: 'Runing super-linter'
         uses: github/super-linter@v4
         env:
           DISABLE_ERRORS: false
           LOG_LEVEL: WARN
-          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_ALL_CODEBASE: "${{ env.VALIDATE_ALL_CODEBASE }}"
           IGNORE_GITIGNORED_FILES: true
           VALIDATE_GITLEAKS: true
           VALIDATE_DOCKERFILE_HADOLINT: true
@@ -50,6 +62,7 @@ jobs:
     needs: lint
     timeout-minutes: 5
     runs-on: ubuntu-latest
+    if: github.ref == ${{ github.event.repository.default_branch }}
     env:
       REGISTRY: ghcr.io
       TAG_NAME: latest
@@ -98,6 +111,7 @@ jobs:
     name: 'Deploing changes'
     needs: [lint, build-and-push]
     runs-on: ubuntu-latest
+    if: github.ref == ${{ github.event.repository.default_branch }}
     environment: production
     env:
       REGISTRY: ghcr.io
