@@ -140,10 +140,12 @@ jobs:
           APP_ENV: ${{ secrets.ENV_PRODUCTION }}
           REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
         run: |
-          echo "variable : ${{ vars.ENV_DEVELOPMENT }}"
-          echo "secret : ${{ secrets.ENV_PRODUCTION }}"
+          echo "variable : ${{ vars.ENV_DEVELOPMENT }}"> DEVELOPMENT.env && cat DEVELOPMENT.env
+          echo "secret : ${{ secrets.ENV_PRODUCTION }}" > PRODUCTION.env && cat PRODUCTION.env
           ssh "$SSH_USER"@"$SSH_HOST" -C "if [ ! -d $APP_DIR/.git ]; then mkdir -p $APP_DIR && git clone $REPOSITORY $APP_DIR; fi";
           ssh "$SSH_USER"@"$SSH_HOST" -C "if [ $APP_DIR/.git ]; then cd $APP_DIR && git checkout $DEFAULT_BRANCH && git pull; fi";
+          scp DEVELOPMENT.env "$SSH_USER"@"$SSH_HOST":/"$APP_DIR"
+          scp PRODUCTION.env "$SSH_USER"@"$SSH_HOST":/"$APP_DIR"
           ssh "$SSH_USER"@"$SSH_HOST" -C "cd $APP_DIR && echo ${{ secrets.ENV_PRODUCTION }} > .env"
 
 
