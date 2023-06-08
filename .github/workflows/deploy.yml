@@ -23,8 +23,8 @@ env:
   REGISTRY: ghcr.io
   TAG_NAME: latest
   CACHE_IMAGE_NAME: buildcache
-  ENV_PRODUCTION: ${{secrets.ENV_PRODUCTION}}
-  APP_DIRECTORY: ${{secrets.APP_DIRECTORY}}
+  ENV_PRODUCTION: "${{secrets.ENV_PRODUCTION}}"
+  APP_DIRECTORY: "${{secrets.APP_DIRECTORY}}"
 
 jobs:
 
