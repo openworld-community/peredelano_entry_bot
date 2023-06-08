@@ -110,13 +110,31 @@ jobs:
       - name: 'install ssh keys'
         # check this thread to understand why its needed:
         # https://stackoverflow.com/a/70447517
+        env:
+          SSH_USER: ${{secrets.SSH_USER}}
+          SSH_KEY: ${{secrets.SSH_PRIVATE_KEY}}
+          SSH_HOST: ${{secrets.SSH_HOST}}
         run: |
+          mkdir -p ~/.ssh/
           install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+          echo "${{SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{SSH_HOST}} > ~/.ssh/known_hosts
+          cat >>~/.ssh/config <<END
+          Host $SSH_HOST
+            HostName $SSH_HOST
+            User $SSH_USER
+            IdentityFile ~/.ssh/id_rsa
+            StrictHostKeyChecking no
+          END
 
       - name: 'connect and pull'
-        run: ssh ${{secrets.SSH_USER}}@${{ secrets.SSH_HOST}} "mkdir -p ${{secrets.APP_DIRECTORY}} && cd ${{secrets.APP_DIRECTORY}} && git clone https://github.com/openworld-community/peredelano_entry_bot.git . && git checkout master && git pull && exit"
+        env:
+          SSH_USER: ${{secrets.SSH_USER}}
+          SSH_KEY: ${{secrets.SSH_PRIVATE_KEY}}
+          SSH_HOST: ${{secrets.SSH_HOST}}
+          APP_DIRECTORY: ${{secrets.APP_DIRECTORY}}
+        run: ssh ${{SSH_USER}}@${{SSH_HOST}} "mkdir -p ${{APP_DIRECTORY}} && cd ${{APP_DIRECTORY}} && git clone https://github.com/openworld-community/peredelano_entry_bot.git . && git checkout spr0sto && git pull && exit"
 
       - name: 'cleanup'
         run: rm -rf ~/.ssh
