@@ -33,11 +33,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set all code validation flage
+      - name: Set all code validation flag for default branch
         if: github.ref_name == ${{ github.event.repository.default_branch }}
         run: echo "VALIDATE_ALL_CODEBASE=true" >> "$GITHUB_ENV"
 
-      - name: Set only difference of code validation at default branch
+      - name: Set only difference of code validation for other branches
         if: github.ref_name != ${{ github.event.repository.default_branch }}
         run: echo "VALIDATE_ALL_CODEBASE=false" >> "$GITHUB_ENV"
 
@@ -62,7 +62,7 @@ jobs:
     needs: lint
     timeout-minutes: 5
     runs-on: ubuntu-latest
-    if: github.ref_name == ${{ github.event.repository.default_branch }}
+    if: github.ref_name == github.event.repository.default_branch
     env:
       REGISTRY: ghcr.io
       TAG_NAME: latest
@@ -111,7 +111,7 @@ jobs:
     name: 'Deploing changes'
     needs: [lint, build-and-push]
     runs-on: ubuntu-latest
-    if: github.ref_name == ${{ github.event.repository.default_branch }}
+    if: github.ref_name == github.event.repository.default_branch
     environment: production
     env:
       REGISTRY: ghcr.io
