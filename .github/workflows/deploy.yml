@@ -139,7 +139,7 @@ jobs:
       - name: 'Connecting, pulling and reload'
         env:
           APP_DIR: ${{ secrets.APP_DIRECTORY }}
-          APP_ENV: ${{ secrets.ENV_PRODUCTION }}
+          APP_ENV: ${{ env.ENV_DEVELOPMENT }}
           REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
         run: |
           ssh "$SSH_USER"@"$SSH_HOST" -C "if [ ! -d $APP_DIR/.git ]; then mkdir -p $APP_DIR && git clone $REPOSITORY $APP_DIR; fi";
