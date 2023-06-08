@@ -164,8 +164,8 @@ jobs:
           debug: true
           script: |
             if [[ ! -d "$APP_DIR/.git" ]]; then pwd && git clone ${{ github.server_url }}/${{ github.repository }} $APP_DIR ; fi
-            if [ -d "$APP_DIR/.git" ]; then git checkout - * && git checkout $DEFAULT_BRANCH && git pull; fi
-#            echo "$APP_ENV">  ~/.ssh/.env
+            if [ -d "$APP_DIR/.git" ]; then git checkout $DEFAULT_BRANCH && git pull; fi
+            echo "$APP_ENV">  ~/.ssh/.env
 #            echo ${{ secrets.GITHUB_TOKEN }} | docker login -u ${{ github.actor }} --password-stdin docker.pkg.github.com
 #            docker compose --file docker-compose.yml pull
 #            docker logout
