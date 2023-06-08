@@ -156,17 +156,17 @@ jobs:
            REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.HOST_USERNAME }}
-          key: ${{ secrets.PRIVATE_KEY }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd "$APP_DIR"
-            if [ ! -d .git ]; then git clone $REPOSITORY . ; fi
-            if [ .git ]; then git checkout - * && git checkout $DEFAULT_BRANCH && git pull; fi
-            echo "$APP_ENV">  ~/.ssh/.env
-            echo ${{ secrets.GITHUB_TOKEN }} | docker login -u ${{ github.actor }} --password-stdin docker.pkg.github.com
-            docker compose --file docker-compose.yml pull
-            docker logout
+#            if [ ! -d .git ]; then git clone $REPOSITORY . ; fi
+#            if [ .git ]; then git checkout - * && git checkout $DEFAULT_BRANCH && git pull; fi
+#            echo "$APP_ENV">  ~/.ssh/.env
+#            echo ${{ secrets.GITHUB_TOKEN }} | docker login -u ${{ github.actor }} --password-stdin docker.pkg.github.com
+#            docker compose --file docker-compose.yml pull
+#            docker logout
 
 #           git checkout master
 #           git pull origin master
