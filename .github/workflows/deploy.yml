@@ -114,10 +114,10 @@ jobs:
           user: ${{secrets.SSH_USER}}
           private_key: ${{secrets.SSH_PRIVATE_KEY}}
           command: |
-                 mkdir -p "${{APP_DIRECTORY}}" && cd "${{APP_DIRECTORY}}";
+                 mkdir -p "${{secrets.APP_DIRECTORY}}" && cd "${{secrets.APP_DIRECTORY}}";
                  git checkout master;
                  git pull;
-                 echo "${{ENV_PRODUCTION}}" > .env
+                 echo "${{secrets.ENV_PRODUCTION}}" > .env
 #                 docker build -t peredelanobot .
 #                 docker stop peredelanobot
 #                 docker run -d --name peredelanobot --rm peredelanobot
