@@ -139,7 +139,8 @@ jobs:
           SSH: "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -C"
           APP_DIR: ${{ secrets.APP_DIRECTORY }}
           APP_ENV: ${{ secrets.ENV_PRODUCTION }}
-          REPOSITORY: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
+#          REPOSITORY: ${{ GITHUB_SERVER_URL }}/${{ GITHUB_REPOSITORY }}
+          REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
         run: |
           ssh "$SSH_USER"@"$SSH_HOST" -C "if [ ! -d $APP_DIR/.git ]; then mkdir -p $APP_DIR && git clone $REPOSITORY $APP_DIR; fi";
           ssh "$SSH_USER"@"$SSH_HOST" -C "if [ $APP_DIR/.git ]; then cd $APP_DIR && git checkout $DEFAULT_BRANCH && git pull && git status; fi";
