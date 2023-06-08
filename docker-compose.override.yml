@@ -1,0 +1,14 @@
+version: '3.5'
+
+services:
+
+  peredelano_entry_bot:
+    environment:
+      COMPOSE_PROJECT_NAME: "${COMPOSE_PROJECT_NAME:-LOCAL}"
+    image: "ghcr.io/openworld-community/peredelano_entry_bot:${TAG:-local}"
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      target: builder
+    volumes:
+      - "./:/app/:ro"
