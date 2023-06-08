@@ -108,6 +108,10 @@ jobs:
     needs: lint
     runs-on: ubuntu-latest
     environment: production
+    env:
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+
     steps:
 
       - name: 'Checkout code'
@@ -115,9 +119,9 @@ jobs:
 
       - name: 'install ssh keys'
         env:
-          SSH_USER: ${{ secrets.SSH_USER }}
+#          SSH_USER: ${{ secrets.SSH_USER }}
           SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
+#          SSH_HOST: ${{ secrets.SSH_HOST }}
         run: |
           mkdir -p ~/.ssh/
           install -m 600 -D /dev/null ~/.ssh/id_rsa
@@ -134,19 +138,21 @@ jobs:
 
       - name: 'connect and pull'
         env:
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH: "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -C"
+#          SSH_USER: ${{ secrets.SSH_USER }}
+#          SSH_HOST: ${{ secrets.SSH_HOST }}
+#          SSH: "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -C"
+          SSH: "$SSH_USER@$SSH_HOST -C "
           APP_DIR: ${{ secrets.APP_DIRECTORY }}
           APP_ENV: ${{ secrets.ENV_PRODUCTION }}
-#          REPOSITORY: ${{ GITHUB_SERVER_URL }}/${{ GITHUB_REPOSITORY }}
           REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
         run: |
           ssh "$SSH_USER"@"$SSH_HOST" -C "if [ ! -d $APP_DIR/.git ]; then mkdir -p $APP_DIR && git clone $REPOSITORY $APP_DIR; fi";
           ssh "$SSH_USER"@"$SSH_HOST" -C "if [ $APP_DIR/.git ]; then cd $APP_DIR && git checkout $DEFAULT_BRANCH && git pull && git status; fi";
-          SSH "echo $APP_ENV > $APP_DIR/.env";
+          $SSH "echo $APP_ENV > $APP_DIR/.env";
           ssh "$SSH_USER"@"$SSH_HOST" -C "docker-compose --file docker-compose.yml build --pull --no-cache";
 #          ssh "$SSH_USER"@"$SSH_HOST" -C "docker-compose --file docker-compose.yml up -d";
+
+
 
       - name: 'cleanup'
         run: rm -rf ~/.ssh
