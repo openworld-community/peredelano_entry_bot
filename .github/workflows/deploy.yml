@@ -108,17 +108,21 @@ jobs:
         uses: actions/checkout@v3
 
       - name: 'Run command on remote server'
-        uses: D3rHase/ssh-command-action@v0.2.2
+#        uses: D3rHase/ssh-command-action@v0.2.2
+        uses: appleboy/ssh-action@master
         with:
           host: ${{secrets.SSH_HOST}}
-          user: ${{secrets.SSH_USER}}
-          private_key: ${{secrets.SSH_PRIVATE_KEY}}
+          #user: ${{secrets.SSH_USER}}
+          username: ${{secrets.SSH_USER}}
+          #private_key: ${{secrets.SSH_PRIVATE_KEY}}
+          key: ${{secrets.SSH_PRIVATE_KEY}}
+          port: 22
           command: |
                  mkdir -p "${{secrets.APP_DIRECTORY}}" && cd "${{secrets.APP_DIRECTORY}}";
-                 git clone https://github.com/openworld-community/peredelano_entry_bot.git .
+                 #git clone --no-checkout https://github.com/openworld-community/peredelano_entry_bot.git .
                  git checkout master;
                  git pull;
-                 echo "${{secrets.ENV_PRODUCTION}}" | base64 -d > .env
+#                 echo "${{secrets.ENV_PRODUCTION}}" | base64 -d > .env
 #                 docker build -t peredelanobot .
 #                 docker stop peredelanobot
 #                 docker run -d --name peredelanobot --rm peredelanobot
