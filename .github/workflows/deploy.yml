@@ -73,7 +73,7 @@ jobs:
 
       - name: 'Export lowercase image names'
         shell: bash
-        # shellcheck disable=2086
+        # shellcheck disable=cs2086
         run: |
           : "${{ env.REGISTRY }}/${{ github.repository }}:latest"
           echo "IMAGE_TAG=${_,,}" | tee -a "$GITHUB_ENV"
@@ -101,8 +101,8 @@ jobs:
           target: release
           tags: "${{ env.IMAGE_TAG }}"
           push: true
-          cache-from: type=registry,ref=$env.CACHE_IMAGE_TAG
-          cache-to: type=registry,ref=$env.CACHE_IMAGE_TAG,mode=max
+          cache-from: type=registry,ref=${{ env.CACHE_IMAGE_TAG }}
+          cache-to: type=registry,ref=${{env.CACHE_IMAGE_TAG }},mode=max
 
 #
   deployment:
