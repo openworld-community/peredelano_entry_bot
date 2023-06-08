@@ -61,93 +61,58 @@ jobs:
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 #
-#  build-and-push:
-#    name: 'Building image and push it to registry'
+  build-and-push:
+    name: 'Building image and push it to registry'
 #    needs: lint
-#    timeout-minutes: 5
-#    runs-on: ubuntu-latest
-#    steps:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    steps:
 
-#      - name: 'Checkout Code'
-#        uses: actions/checkout@v3
+      - name: 'Checkout Code'
+        uses: actions/checkout@v3
 
-#      - name: 'Export lowercase image names'
-#        shell: bash
-#        # shellcheck disable=2086
-#        run: |
-#          : "$env.REGISTRY/${{ github.repository }}:latest"
-#          echo "IMAGE_TAG=${_,,}" | tee -a "$GITHUB_ENV"
-#          : "$env.REGISTRY/${{ github.repository }}/$env.CACHE_IMAGE_NAME:latest"
-#          echo "env.CACHE_IMAGE_TAG=${_,,}" | tee -a "$GITHUB_ENV"
+      - name: 'Export lowercase image names'
+        shell: bash
+        # shellcheck disable=2086
+        run: |
+          : "$env.REGISTRY/${{ github.repository }}:latest"
+          echo "IMAGE_TAG=${_,,}" | tee -a "$GITHUB_ENV"
+          : "$env.REGISTRY/${{ github.repository }}/$env.CACHE_IMAGE_NAME:latest"
+          echo "env.CACHE_IMAGE_TAG=${_,,}" | tee -a "$GITHUB_ENV"
 
-#      - name: 'Login to GHCR'
-#        uses: docker/login-action@v2
-#        with:
-#          registry: ${{ env.REGISTRY }}
-#          username: ${{ github.actor }}
-#          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: 'Login to GHCR'
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-#      - name: 'Set up Docker Buildx'
-#        id: buildx
-#        uses: docker/setup-buildx-action@v2
+      - name: 'Set up Docker Buildx'
+        id: buildx
+        uses: docker/setup-buildx-action@v2
 
-#      - name: 'Build and push docker image'
-#        uses: docker/build-push-action@v3
-#        with:
-#          builder: ${{ steps.buildx.outputs.name }}
-#          context: ./
-#          file: ./Dockerfile
-#          tags: "$IMAGE_TAG"
-#          push: true
-#          cache-from: type=registry,ref=$env.CACHE_IMAGE_TAG
-#          cache-to: type=registry,ref=$env.CACHE_IMAGE_TAG,mode=max
+      - name: 'Build and push docker image'
+        uses: docker/build-push-action@v3
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: ./
+          file: ./Dockerfile
+          tags: "$IMAGE_TAG"
+          push: true
+          cache-from: type=registry,ref=$env.CACHE_IMAGE_TAG
+          cache-to: type=registry,ref=$env.CACHE_IMAGE_TAG,mode=max
 
 #
   deployment:
     name: 'Deploing changes'
-#    needs: lint
+    needs: build-and-push
     runs-on: ubuntu-latest
     environment: production
-    env:
-      SSH_USER: ${{ secrets.SSH_USER }}
-      SSH_HOST: ${{ secrets.SSH_HOST }}
 
     steps:
 
-      - name: 'Checkout code'
-        uses: actions/checkout@v3
-
-      - name: 'Installing ssh keys'
-        env:
-          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          mkdir -p ~/.ssh/
-          install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H "$SSH_HOST" > ~/.ssh/known_hosts
-          cat >>~/.ssh/config <<END
-          Host "$SSH_HOST"
-            HostName "$SSH_HOST"
-            User "$SSH_USER"
-            IdentityFile ~/.ssh/id_rsa
-            StrictHostKeyChecking no
-          END
-
-#      - name: 'Connecting, pulling and reload'
-#        env:
-#          APP_DIR: ${{ secrets.APP_DIRECTORY }}
-#          APP_ENV: ${{ secrets.ENV_PRODUCTION }}
-#          REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
-#        run: |
-#          echo "$APP_ENV">  ~/.ssh/.env
-#          ssh "$SSH_USER"@"$SSH_HOST" -C "if [ ! -d $APP_DIR/.git ]; then mkdir -p $APP_DIR && git clone $REPOSITORY $APP_DIR; fi";
-#          ssh "$SSH_USER"@"$SSH_HOST" -C "if [ $APP_DIR/.git ]; then cd $APP_DIR && git checkout $DEFAULT_BRANCH && git pull; fi";
-#          scp  ~/.ssh/.env "$SSH_USER"@"$SSH_HOST":~/"$APP_DIR"
-
-#          ssh "$SSH_USER"@"$SSH_HOST" -C "cd $APP_DIR && docker compose --file docker-compose.yml build --pull --no-cache";
-#          ssh "$SSH_USER"@"$SSH_HOST" -C "cd $APP_DIR && docker compose --file docker-compose.yml up -d";
-
+#      - name: 'Checkout code'
+#        uses: actions/checkout@v3
 
       - name: Checkout and restart the server
         env:
@@ -169,13 +134,11 @@ jobs:
             echo "$APP_ENV">  .env
             echo ${{ secrets.GITHUB_TOKEN }} | docker login -u ${{ github.actor }} --password-stdin docker.pkg.github.com
             docker compose --file docker-compose.yml pull
+            ### CASE: Build with preferred pulling without cache and reload
+            #docker-compose --file docker-compose.yml build --pull --no-cache;
+            #docker-compose --file docker-compose.yml up -d
+            #docker system prune --all --force;
             docker logout
-
-#           git checkout master
-#           git pull origin master
-#           sudo kill $(ps aux | grep gunicorn | grep -v grep | awk ‘{print $2}’)
-#           sudo /home/ubuntu/polls/.venv/bin/gunicorn — daemon —  workers=4 mysite.wsgi:application -b 0.0.0.0:80
-
 
       - name: 'cleanup'
         run: rm -rf ~/.ssh
