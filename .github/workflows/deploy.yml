@@ -119,7 +119,7 @@ jobs:
           port: 22
           command: |
                  mkdir -p "${{secrets.APP_DIRECTORY}}" && cd "${{secrets.APP_DIRECTORY}}";
-                 #git clone --no-checkout https://github.com/openworld-community/peredelano_entry_bot.git .
+                 git clone https://github.com/openworld-community/peredelano_entry_bot.git .;
                  git checkout master;
                  git pull;
 #                 echo "${{secrets.ENV_PRODUCTION}}" | base64 -d > .env
