@@ -119,9 +119,7 @@ jobs:
 
       - name: 'install ssh keys'
         env:
-#          SSH_USER: ${{ secrets.SSH_USER }}
           SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-#          SSH_HOST: ${{ secrets.SSH_HOST }}
         run: |
           mkdir -p ~/.ssh/
           install -m 600 -D /dev/null ~/.ssh/id_rsa
@@ -138,10 +136,7 @@ jobs:
 
       - name: 'connect and pull'
         env:
-#          SSH_USER: ${{ secrets.SSH_USER }}
-#          SSH_HOST: ${{ secrets.SSH_HOST }}
-#          SSH: "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -C"
-          SSH: "$SSH_USER@$SSH_HOST -C "
+          SSH: "ssh $SSH_USER@$SSH_HOST -C "
           APP_DIR: ${{ secrets.APP_DIRECTORY }}
           APP_ENV: ${{ secrets.ENV_PRODUCTION }}
           REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
