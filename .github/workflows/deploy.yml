@@ -152,13 +152,16 @@ jobs:
       - name: Checkout and restart the server
         env:
           APP_DIR: ${{ secrets.APP_DIRECTORY }}
-#          APP_ENV: ${{ secrets.ENV_PRODUCTION }}
-#          REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
+          APP_ENV: ${{ secrets.ENV_PRODUCTION }}
+          REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
+          port: 22
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: APP_DIR,APP_ENV,REPOSITORY,DEFAULT_BRANCH
+          debug: true
           script: |
             if [[ ! -d "$APP_DIR/.git" ]]; then pwd && git clone ${{ github.server_url }}/${{ github.repository }} $APP_DIR ; fi
 
