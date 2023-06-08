@@ -6,23 +6,17 @@
 
 name: Deployment
 
-env:
-  DEFAULT_BRANCH: "spr0sto"
-  REGISTRY: ghcr.io
-  TAG_NAME: latest
-  CACHE_IMAGE_NAME: buildcache
+#env:
+#  REGISTRY: ghcr.io
+#  TAG_NAME: latest
+#  CACHE_IMAGE_NAME: buildcache
 
 concurrency:
   group: production
   cancel-in-progress: true
 
 on:
-#  push:
-#    branches:
-#      - master
-#      - spr0sto
-  pull_request:
-    types: ['opened', 'edited', 'reopened', 'synchronize']
+  push:
     branches:
       - master
   workflow_dispatch:
@@ -35,37 +29,42 @@ permissions:
 jobs:
 
 #
-#  lint:
-#    name: 'Checking code syntax'
-#    runs-on: ubuntu-latest
-#    steps:
+  lint:
+    name: 'Checking code syntax'
+    runs-on: ubuntu-latest
+    steps:
 
-#      - name: 'Checkout Code'
-#        uses: actions/checkout@v3
-#        with:
-#          fetch-depth: 0
+      - name: 'Checkout Code'
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-#      - name: 'Lint Code Base'
-#        uses: github/super-linter@v4
-#        env:
-#          DISABLE_ERRORS: false
-#          LOG_LEVEL: WARN
-#          VALIDATE_ALL_CODEBASE: false
-#          IGNORE_GITIGNORED_FILES: true
-#          VALIDATE_GITLEAKS: true
-#          VALIDATE_DOCKERFILE_HADOLINT: true
-#          VALIDATE_PYTHON: true
-#          VALIDATE_YAML: true
-#          VALIDATE_MARKDOWN: true
-#          VALIDATE_GITHUB_ACTIONS: true
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: 'Lint Code Base'
+        uses: github/super-linter@v4
+        env:
+          DISABLE_ERRORS: false
+          LOG_LEVEL: WARN
+          VALIDATE_ALL_CODEBASE: false
+          IGNORE_GITIGNORED_FILES: true
+          VALIDATE_GITLEAKS: true
+          VALIDATE_DOCKERFILE_HADOLINT: true
+          VALIDATE_PYTHON: true
+          VALIDATE_YAML: true
+          VALIDATE_MARKDOWN: true
+          VALIDATE_GITHUB_ACTIONS: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 #
   build-and-push:
     name: 'Building image and push it to registry'
-#    needs: lint
+    needs: lint
     timeout-minutes: 5
     runs-on: ubuntu-latest
+    env:
+      REGISTRY: ghcr.io
+      TAG_NAME: latest
+      CACHE_IMAGE_NAME: buildcache
+
     steps:
 
       - name: 'Checkout Code'
@@ -102,12 +101,12 @@ jobs:
           tags: "${{ env.IMAGE_TAG }}"
           push: true
           cache-from: type=registry,ref=${{ env.CACHE_IMAGE_TAG }}
-          cache-to: type=registry,ref=${{env.CACHE_IMAGE_TAG }},mode=max
+          cache-to: type=registry,ref=${{ env.CACHE_IMAGE_TAG }},mode=max
 
 #
   deployment:
     name: 'Deploing changes'
-    needs: build-and-push
+    needs: [lint, build-and-push]
     runs-on: ubuntu-latest
     environment: production
 
@@ -121,18 +120,17 @@ jobs:
           APP_DIR: ${{ secrets.APP_DIRECTORY }}
           APP_ENV: ${{ secrets.ENV_PRODUCTION }}
           REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
-          DEFAULT_BRANCH: "spr0sto"
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           port: 22
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: APP_DIR,APP_ENV,REPOSITORY,DEFAULT_BRANCH
+          envs: APP_DIR,APP_ENV,REPOSITORY
           debug: true
           script: |
             if [[ ! -d "$APP_DIR/.git" ]]; then pwd && git clone ${{ github.server_url }}/${{ github.repository }} $APP_DIR ; fi
-            if [[ -d "$APP_DIR/.git" ]]; then cd $APP_DIR && git checkout $DEFAULT_BRANCH && git pull; fi
+            if [[ -d "$APP_DIR/.git" ]]; then cd $APP_DIR && git checkout ${{ github.event.repository.default_branch }} && git pull; fi
             echo "$APP_ENV">  .env
             echo ${{ secrets.GITHUB_TOKEN }} | docker login -u ${{ github.actor }} --password-stdin docker.pkg.github.com
             docker compose --file docker-compose.yml pull
@@ -145,12 +143,3 @@ jobs:
       - name: 'cleanup'
         run: rm -rf ~/.ssh
 
-
-                 ### CASE: Build with preferred pulling without cache and reload
-                 #docker-compose --file docker-compose.yml build --pull --no-cache;
-                 #docker-compose --file docker-compose.yml up -d
-                 #docker system prune --all --force;
-                 ### CASE: Restart it with rebuild
-                 #docker-compose --file docker-compose.yml down --remove-orphans;
-                 #docker-compose --file docker-compose.yml up -d --build;
-                 #docker system prune --all --force;
