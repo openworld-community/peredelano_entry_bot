@@ -60,7 +60,7 @@ jobs:
     needs: lint
     timeout-minutes: 5
     runs-on: ubuntu-latest
-    if: github.ref_name == github.event.repository.default_branch
+    #if: github.ref_name == github.event.repository.default_branch
     env:
       REGISTRY: ghcr.io
       TAG_NAME: latest
