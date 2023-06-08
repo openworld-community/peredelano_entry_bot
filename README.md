@@ -66,4 +66,5 @@ Stop the service of application.
 docker compose down --remove-orphans
 ```
 
-Optionaly you can use [local pre-commit hook with linter](./.githooks/README.md - "local pre-commit hook with linter").
+Use a local code quality check with [local pre-commit hook with linter](./.githooks/README.md). By doing this, you will help our community
+reduce the **[cost of GitHub infrastructure](https://docs.github.com/ru/billing/managing-billing-for-github-actions/about-billing-for-github-actions)**.
