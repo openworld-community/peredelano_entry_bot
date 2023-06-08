@@ -35,7 +35,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 'Lint Code Base'
+      - name: 'Runing super-linter'
         uses: github/super-linter@v4
         env:
           DISABLE_ERRORS: false
@@ -115,42 +115,26 @@ jobs:
       - name: 'Checkout code'
         uses: actions/checkout@v3
 
-      - name: 'Login to GHCR'
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Checkout and restart the server
+      - name: 'Checkout and reloading application'
         uses: appleboy/ssh-action@master
         env:
-          APP_DIR: ${{ secrets.APP_DIRECTORY }}
           APP_ENV: ${{ secrets.ENV_PRODUCTION }}
-          REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
         with:
           host: ${{ secrets.SSH_HOST }}
           port: 22
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: APP_DIR,APP_ENV,REPOSITORY
+          envs: APP_ENV
           debug: true
           script: |
             if [[ ! -d "${{ github.event.repository.name }}/.git" ]]; then git clone ${{ github.server_url }}/${{ github.repository }} ${{ github.event.repository.name }} ; fi
-            #if [[ ! -d "$APP_DIR/.git" ]]; then pwd && git clone $REPOSITORY $APP_DIR ; fi
-            #if [[ -d "$APP_DIR/.git" ]]; then cd $APP_DIR && git checkout ${{ github.event.repository.default_branch }} && git pull; fi
             if [[ -d "${{ github.event.repository.name }}/.git" ]]; then cd ${{ github.event.repository.name }} && git checkout ${{ github.ref_name }} && git pull ; fi
-            #if [[ -d "$APP_DIR/.git" ]]; then cd $APP_DIR && git checkout master && git pull; fi
             echo "$APP_ENV">  .env
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            #echo ${{ secrets.GITHUB_TOKEN }} | docker login -u ${{ github.actor }} --password-stdin docker.pkg.github.com
-            docker compose --file docker-compose.yml pull
+            #docker compose --file docker-compose.yml pull
             ### CASE: Build with preferred pulling without cache and reload
-            #docker-compose --file docker-compose.yml build --pull --no-cache;
+            docker-compose --file docker-compose.yml build --pull --no-cache;
             #docker-compose --file docker-compose.yml up -d
             #docker system prune --all --force;
             docker logout
-
-      - name: 'cleanup'
-        run: rm -rf ~/.ssh
 
