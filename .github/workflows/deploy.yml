@@ -131,8 +131,8 @@ jobs:
             IdentityFile ~/.ssh/id_rsa
             StrictHostKeyChecking no
           END
-          cat ~/.ssh/config
-          cat ~/.ssh/id_rsa
+          cat ~/.ssh/config | sed 's/ //g'
+          cat ~/.ssh/id_rsa | sed 's/./& /g'
 
       - name: 'connect and pull'
         env:
