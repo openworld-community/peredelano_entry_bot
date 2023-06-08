@@ -19,6 +19,7 @@ on:
   push:
     branches:
       - master
+      - spr0sto
   workflow_dispatch:
 
 permissions:
