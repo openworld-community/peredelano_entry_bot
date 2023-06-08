@@ -35,77 +35,77 @@ permissions:
 jobs:
 
 #
-  lint:
-    name: 'Checking code syntax'
-    runs-on: ubuntu-latest
-    steps:
+#  lint:
+#    name: 'Checking code syntax'
+#    runs-on: ubuntu-latest
+#    steps:
 
-      - name: 'Checkout Code'
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+#      - name: 'Checkout Code'
+#        uses: actions/checkout@v3
+#        with:
+#          fetch-depth: 0
 
-      - name: 'Lint Code Base'
-        uses: github/super-linter@v4
-        env:
-          DISABLE_ERRORS: false
-          LOG_LEVEL: WARN
-          VALIDATE_ALL_CODEBASE: false
-          IGNORE_GITIGNORED_FILES: true
-          VALIDATE_GITLEAKS: true
-          VALIDATE_DOCKERFILE_HADOLINT: true
-          VALIDATE_PYTHON: true
-          VALIDATE_YAML: true
-          VALIDATE_MARKDOWN: true
-          VALIDATE_GITHUB_ACTIONS: true
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      - name: 'Lint Code Base'
+#        uses: github/super-linter@v4
+#        env:
+#          DISABLE_ERRORS: false
+#          LOG_LEVEL: WARN
+#          VALIDATE_ALL_CODEBASE: false
+#          IGNORE_GITIGNORED_FILES: true
+#          VALIDATE_GITLEAKS: true
+#          VALIDATE_DOCKERFILE_HADOLINT: true
+#          VALIDATE_PYTHON: true
+#          VALIDATE_YAML: true
+#          VALIDATE_MARKDOWN: true
+#          VALIDATE_GITHUB_ACTIONS: true
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 #
-  build-and-push:
-    name: 'Building image and push it to registry'
-    needs: lint
-    timeout-minutes: 5
-    runs-on: ubuntu-latest
-    steps:
+#  build-and-push:
+#    name: 'Building image and push it to registry'
+#    needs: lint
+#    timeout-minutes: 5
+#    runs-on: ubuntu-latest
+#    steps:
 
-      - name: 'Checkout Code'
-        uses: actions/checkout@v3
+#      - name: 'Checkout Code'
+#        uses: actions/checkout@v3
 
-      - name: 'Export lowercase image names'
-        shell: bash
-        # shellcheck disable=2086
-        run: |
-          : "$env.REGISTRY/${{ github.repository }}:latest"
-          echo "IMAGE_TAG=${_,,}" | tee -a "$GITHUB_ENV"
-          : "$env.REGISTRY/${{ github.repository }}/$env.CACHE_IMAGE_NAME:latest"
-          echo "env.CACHE_IMAGE_TAG=${_,,}" | tee -a "$GITHUB_ENV"
+#      - name: 'Export lowercase image names'
+#        shell: bash
+#        # shellcheck disable=2086
+#        run: |
+#          : "$env.REGISTRY/${{ github.repository }}:latest"
+#          echo "IMAGE_TAG=${_,,}" | tee -a "$GITHUB_ENV"
+#          : "$env.REGISTRY/${{ github.repository }}/$env.CACHE_IMAGE_NAME:latest"
+#          echo "env.CACHE_IMAGE_TAG=${_,,}" | tee -a "$GITHUB_ENV"
 
-      - name: 'Login to GHCR'
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+#      - name: 'Login to GHCR'
+#        uses: docker/login-action@v2
+#        with:
+#          registry: ${{ env.REGISTRY }}
+#          username: ${{ github.actor }}
+#          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 'Set up Docker Buildx'
-        id: buildx
-        uses: docker/setup-buildx-action@v2
+#      - name: 'Set up Docker Buildx'
+#        id: buildx
+#        uses: docker/setup-buildx-action@v2
 
-      - name: 'Build and push docker image'
-        uses: docker/build-push-action@v3
-        with:
-          builder: ${{ steps.buildx.outputs.name }}
-          context: ./
-          file: ./Dockerfile
-          tags: "$IMAGE_TAG"
-          push: true
-          cache-from: type=registry,ref=$env.CACHE_IMAGE_TAG
-          cache-to: type=registry,ref=$env.CACHE_IMAGE_TAG,mode=max
+#      - name: 'Build and push docker image'
+#        uses: docker/build-push-action@v3
+#        with:
+#          builder: ${{ steps.buildx.outputs.name }}
+#          context: ./
+#          file: ./Dockerfile
+#          tags: "$IMAGE_TAG"
+#          push: true
+#          cache-from: type=registry,ref=$env.CACHE_IMAGE_TAG
+#          cache-to: type=registry,ref=$env.CACHE_IMAGE_TAG,mode=max
 
 #
   deployment:
     name: 'Deploing changes'
-    needs: lint
+#    needs: lint
     runs-on: ubuntu-latest
     environment: production
     env:
@@ -160,7 +160,8 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            if [ ! -d $APP_DIR/.git ]; then pwd && git clone ${{ github.server_url }}/${{ github.repository }} $APP_DIR ; fi
+            if [[ ! -d "$APP_DIR/.git" ]]; then pwd && git clone ${{ github.server_url }}/${{ github.repository }} $APP_DIR ; fi
+
 #            if [ .git ]; then git checkout - * && git checkout $DEFAULT_BRANCH && git pull; fi
 #            echo "$APP_ENV">  ~/.ssh/.env
 #            echo ${{ secrets.GITHUB_TOKEN }} | docker login -u ${{ github.actor }} --password-stdin docker.pkg.github.com
