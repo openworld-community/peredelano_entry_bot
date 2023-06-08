@@ -132,7 +132,10 @@ jobs:
           SSH_KEY: ${{secrets.SSH_PRIVATE_KEY}}
           SSH_HOST: ${{secrets.SSH_HOST}}
           APP_DIRECTORY: ${{secrets.APP_DIRECTORY}}
-        run: ssh "$SSH_USER"@"$SSH_HOST" < "mkdir -p $APP_DIRECTORY && cd $APP_DIRECTORY && git clone https://github.com/openworld-community/peredelano_entry_bot.git . && git checkout spr0sto && git pull && exit"
+        run: |
+          ssh "$SSH_USER"@"$SSH_HOST" < "mkdir -p $APP_DIRECTORY && cd $APP_DIRECTORY && PWD";
+          ssh "$SSH_USER"@"$SSH_HOST" < "cd $APP_DIRECTORY && git clone https://github.com/openworld-community/peredelano_entry_bot.git . && ls -la ";
+          ssh "$SSH_USER"@"$SSH_HOST" < "cd $APP_DIRECTORY && git checkout spr0sto && git pull && git status";
 
       - name: 'cleanup'
         run: rm -rf ~/.ssh
