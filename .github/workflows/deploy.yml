@@ -105,6 +105,10 @@ jobs:
     needs: [lint, build-and-push]
     runs-on: ubuntu-latest
     environment: production
+    env:
+      REGISTRY: ghcr.io
+      TAG_NAME: latest
+      CACHE_IMAGE_NAME: buildcache
 
     steps:
 
