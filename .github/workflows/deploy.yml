@@ -23,6 +23,8 @@ env:
   REGISTRY: ghcr.io
   TAG_NAME: latest
   CACHE_IMAGE_NAME: buildcache
+  ENV_PRODUCTION: ${{secrets.ENV_PRODUCTION}}
+  APP_DIRECTORY: ${{secrets.APP_DIRECTORY}}
 
 jobs:
 
@@ -107,15 +109,12 @@ jobs:
 
       - name: 'Run command on remote server'
         uses: D3rHase/ssh-command-action@v0.2.2
-        env:
-          ENV_PRODUCTION: ${{secrets.ENV_PRODUCTION}}
-          APP_DIRECTORY: ${{secrets.APP_DIRECTORY}}
         with:
           host: ${{secrets.SSH_HOST}}
           user: ${{secrets.SSH_USER}}
           private_key: ${{secrets.SSH_PRIVATE_KEY}}
           command: |
-                 mkdir -p "${{secrets.ENV_PRODUCTION}}" && cd "${{secrets.ENV_PRODUCTION}}";
+                 mkdir -p "${{APP_DIRECTORY}}" && cd "${{APP_DIRECTORY}}";
                  git checkout master;
                  git pull;
                  echo "${{ENV_PRODUCTION}}" > .env
