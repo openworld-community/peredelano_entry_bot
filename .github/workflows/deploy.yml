@@ -6,11 +6,6 @@
 
 name: Deployment
 
-#env:
-#  REGISTRY: ghcr.io
-#  TAG_NAME: latest
-#  CACHE_IMAGE_NAME: buildcache
-
 concurrency:
   group: production
   cancel-in-progress: true
@@ -113,15 +108,15 @@ jobs:
 
     steps:
 
-#      - name: 'Checkout code'
-#        uses: actions/checkout@v3
+      - name: 'Checkout code'
+        uses: actions/checkout@v3
 
       - name: Checkout and restart the server
+        uses: appleboy/ssh-action@master
         env:
           APP_DIR: ${{ secrets.APP_DIRECTORY }}
           APP_ENV: ${{ secrets.ENV_PRODUCTION }}
           REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
-        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           port: 22
@@ -130,9 +125,11 @@ jobs:
           envs: APP_DIR,APP_ENV,REPOSITORY
           debug: true
           script: |
-            if [[ ! -d "$APP_DIR/.git" ]]; then pwd && git clone ${{ github.server_url }}/${{ github.repository }} ${{ github.ref_name }} ; fi
-#            if [[ -d "$APP_DIR/.git" ]]; then cd $APP_DIR && git checkout ${{ github.event.repository.default_branch }} && git pull; fi
-            if [[ -d "$APP_DIR/.git" ]]; then cd $APP_DIR && git checkout ${{ github.ref_name }} && git pull; fi
+            if [[ ! -d ${{ github.ref_name }}/.git" ]]; then pwd && git clone ${{ github.server_url }}/${{ github.repository }} ${{ github.ref_name }} ; fi
+            #if [[ ! -d "$APP_DIR/.git" ]]; then pwd && git clone $REPOSITORY $APP_DIR ; fi
+            #if [[ -d "$APP_DIR/.git" ]]; then cd $APP_DIR && git checkout ${{ github.event.repository.default_branch }} && git pull; fi
+            if [[ -d "${{ github.ref_name }}/.git" ]]; then cd ${{ github.ref_name }} && git checkout ${{ github.ref_name }} && git pull; fi
+            #if [[ -d "$APP_DIR/.git" ]]; then cd $APP_DIR && git checkout master && git pull; fi
             echo "$APP_ENV">  .env
             echo ${{ secrets.GITHUB_TOKEN }} | docker login -u ${{ github.actor }} --password-stdin docker.pkg.github.com
             docker compose --file docker-compose.yml pull
