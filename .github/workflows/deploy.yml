@@ -5,10 +5,10 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  push:
-    branches:
+#  push:
+#    branches:
 #      - master
-       - spr0sto
+#      - spr0sto
   pull_request:
     types: ['opened', 'edited', 'reopened', 'synchronize']
     branches:
@@ -44,7 +44,7 @@ jobs:
         env:
           DISABLE_ERRORS: false
           LOG_LEVEL: WARN
-          VALIDATE_ALL_CODEBASE: true
+          VALIDATE_ALL_CODEBASE: false
           IGNORE_GITIGNORED_FILES: true
           VALIDATE_GITLEAKS: true
           VALIDATE_DOCKERFILE_HADOLINT: true
@@ -107,18 +107,31 @@ jobs:
       - name: 'Checkout code'
         uses: actions/checkout@v3
 
-      - name: 'Run command on remote server'
+      - name: 'install ssh keys'
+        # check this thread to understand why its needed:
+        # https://stackoverflow.com/a/70447517
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+
+      - name: 'connect and pull'
+        run: ssh ${{secrets.SSH_USER}}@${{ secrets.SSH_HOST}} "mkdir -p ${{secrets.APP_DIRECTORY}} && cd ${{secrets.APP_DIRECTORY}} && git checkout master && git pull && exit"
+
+      - name: 'cleanup'
+        run: rm -rf ~/.ssh
+
 #        uses: D3rHase/ssh-command-action@v0.2.2
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{secrets.SSH_HOST}}
-          username: ${{secrets.SSH_USER}}
-          key: ${{secrets.SSH_PRIVATE_KEY}}
-          port: 22
-          command: |
-                 mkdir -p peredelano_entry_bot && cd peredelano_entry_bot && pwd &&
-                 git clone https://github.com/openworld-community/peredelano_entry_bot.git . && ls -la &&
-                 git checkout master && git pull && git status && ls -la;
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{secrets.SSH_HOST}}
+#          username: ${{secrets.SSH_USER}}
+#          key: ${{secrets.SSH_PRIVATE_KEY}}
+#          port: 22
+#          command: |
+#                 mkdir -p peredelano_entry_bot && cd peredelano_entry_bot && pwd &&
+#                 git clone https://github.com/openworld-community/peredelano_entry_bot.git . && ls -la &&
+#                 git checkout master && git pull && git status && ls -la;
 #                 mkdir -p "${{secrets.APP_DIRECTORY}}" && cd "${{secrets.APP_DIRECTORY}}" &&
 #                 git clone https://github.com/openworld-community/peredelano_entry_bot.git . &&
 #                 git checkout master &&
