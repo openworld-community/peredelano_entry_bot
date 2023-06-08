@@ -116,7 +116,7 @@ jobs:
           ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
 
       - name: 'connect and pull'
-        run: ssh ${{secrets.SSH_USER}}@${{ secrets.SSH_HOST}} "mkdir -p ${{secrets.APP_DIRECTORY}} && cd ${{secrets.APP_DIRECTORY}} && git checkout master && git pull && exit"
+        run: ssh ${{secrets.SSH_USER}}@${{ secrets.SSH_HOST}} "mkdir -p ${{secrets.APP_DIRECTORY}} && cd ${{secrets.APP_DIRECTORY}} && git clone https://github.com/openworld-community/peredelano_entry_bot.git . && git checkout master && git pull && exit"
 
       - name: 'cleanup'
         run: rm -rf ~/.ssh
