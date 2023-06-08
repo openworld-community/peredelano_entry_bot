@@ -125,10 +125,10 @@ jobs:
           envs: APP_DIR,APP_ENV,REPOSITORY
           debug: true
           script: |
-            if [[ ! -d ${{ github.ref_name }}/.git" ]]; then pwd && git clone ${{ github.server_url }}/${{ github.repository }} ${{ github.ref_name }} ; fi
+            if [[ ! -d "${{ github.event.repository.name }}/.git" ]]; then git clone ${{ github.server_url }}/${{ github.repository }} ${{ github.event.repository.name }} ; fi
             #if [[ ! -d "$APP_DIR/.git" ]]; then pwd && git clone $REPOSITORY $APP_DIR ; fi
             #if [[ -d "$APP_DIR/.git" ]]; then cd $APP_DIR && git checkout ${{ github.event.repository.default_branch }} && git pull; fi
-            if [[ -d "${{ github.ref_name }}/.git" ]]; then cd ${{ github.ref_name }} && git checkout ${{ github.ref_name }} && git pull; fi
+            if [[ -d "${{ github.event.repository.name }}/.git" ]]; then cd ${{ github.event.repository.name }} && git checkout ${{ github.ref_name }} && git pull ; fi
             #if [[ -d "$APP_DIR/.git" ]]; then cd $APP_DIR && git checkout master && git pull; fi
             echo "$APP_ENV">  .env
             echo ${{ secrets.GITHUB_TOKEN }} | docker login -u ${{ github.actor }} --password-stdin docker.pkg.github.com
