@@ -111,6 +111,13 @@ jobs:
       - name: 'Checkout code'
         uses: actions/checkout@v3
 
+      - name: 'Login to GHCR'
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Checkout and restart the server
         uses: appleboy/ssh-action@master
         env:
@@ -131,7 +138,7 @@ jobs:
             if [[ -d "${{ github.event.repository.name }}/.git" ]]; then cd ${{ github.event.repository.name }} && git checkout ${{ github.ref_name }} && git pull ; fi
             #if [[ -d "$APP_DIR/.git" ]]; then cd $APP_DIR && git checkout master && git pull; fi
             echo "$APP_ENV">  .env
-            echo ${{ secrets.GITHUB_TOKEN }} | docker login -u ${{ github.actor }} --password-stdin docker.pkg.github.com
+            #echo ${{ secrets.GITHUB_TOKEN }} | docker login -u ${{ github.actor }} --password-stdin docker.pkg.github.com
             docker compose --file docker-compose.yml pull
             ### CASE: Build with preferred pulling without cache and reload
             #docker-compose --file docker-compose.yml build --pull --no-cache;
