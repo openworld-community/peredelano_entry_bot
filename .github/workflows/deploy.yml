@@ -1,3 +1,6 @@
+# TODO: get default branch from repo and set it for all steps
+# TODO: Optimeze name's of variables/secrets and refactor for most (re)usable
+
 name: Deployment
 
 concurrency:
@@ -125,6 +128,8 @@ jobs:
             IdentityFile ~/.ssh/id_rsa
             StrictHostKeyChecking no
           END
+          cat ~/.ssh/config
+          cat ~/.ssh/id_rsa
 
       - name: 'connect and pull'
         env:
