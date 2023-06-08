@@ -143,7 +143,7 @@ jobs:
           ssh "$SSH_USER"@"$SSH_HOST" -C "if [ ! -d $APP_DIR/.git ]; then mkdir -p $APP_DIR && git clone $REPOSITORY $APP_DIR; fi";
           ssh "$SSH_USER"@"$SSH_HOST" -C "if [ $APP_DIR/.git ]; then cd $APP_DIR && git checkout $DEFAULT_BRANCH && git pull; fi";
           ssh "$SSH_USER"@"$SSH_HOST" -C "cd $APP_DIR && echo $APP_ENV > .env";
-          ssh "$SSH_USER"@"$SSH_HOST" -C "cd $APP_DIR && docker compose --file docker-compose.yml build --pull --no-cache";
+#          ssh "$SSH_USER"@"$SSH_HOST" -C "cd $APP_DIR && docker compose --file docker-compose.yml build --pull --no-cache";
 #          ssh "$SSH_USER"@"$SSH_HOST" -C "cd $APP_DIR && docker compose --file docker-compose.yml up -d";
 
       - name: 'cleanup'
