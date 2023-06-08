@@ -151,17 +151,16 @@ jobs:
 
       - name: Checkout and restart the server
         env:
-           APP_DIR: ${{ secrets.APP_DIRECTORY }}
-           APP_ENV: ${{ secrets.ENV_PRODUCTION }}
-           REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
+          APP_DIR: ${{ secrets.APP_DIRECTORY }}
+#          APP_ENV: ${{ secrets.ENV_PRODUCTION }}
+#          REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd "$APP_DIR"
-            if [ ! -d .git ]; then git clone $REPOSITORY . ; fi
+            if [ ! -d $APP_DIR/.git ]; then pwd && git clone ${{ github.server_url }}/${{ github.repository }} $APP_DIR ; fi
 #            if [ .git ]; then git checkout - * && git checkout $DEFAULT_BRANCH && git pull; fi
 #            echo "$APP_ENV">  ~/.ssh/.env
 #            echo ${{ secrets.GITHUB_TOKEN }} | docker login -u ${{ github.actor }} --password-stdin docker.pkg.github.com
