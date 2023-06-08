@@ -154,6 +154,7 @@ jobs:
           APP_DIR: ${{ secrets.APP_DIRECTORY }}
           APP_ENV: ${{ secrets.ENV_PRODUCTION }}
           REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
+          DEFAULT_BRANCH: "spr0sto"
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
