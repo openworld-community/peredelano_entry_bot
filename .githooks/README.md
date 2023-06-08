@@ -1,4 +1,4 @@
- pre-commit hook
+# pre-commit hook
 
 ## Local syntax check and code review
 

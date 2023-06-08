@@ -11,7 +11,7 @@
 
 ## Development
 
-This section contains general information for those who intend to make changes to the project code.
+This section contains general and trivially information for those who intend to make changes to the project code.
 
 ### Requirements
 
@@ -25,7 +25,7 @@ Clone code to your workstation.
 
 ```bash
 #!/bin/bash
-git clone
+git clone git@github.com:openworld-community/peredelano_entry_bot.git
 ```
 
 Create new branch for you code with new feature/fix/refactoring.
@@ -51,14 +51,22 @@ docker compose pull
 
 **Notice**: To override the behavior of "docker-compose.yml" when developing locally, use the "docker-compose.override.yml" file.
 
-Run the service of application.
+In other way you can build image locally. Change value of variable 'TAG' an '.env' file before build local image.
+
+```bash
+#!/bin/bash
+cat .env |grep -i tag
+TAG=local
+```
+
+Run the application.
 
 ```bash
 #!/bin/bash
 docker compose up -d
 ```
 
-Stop the service of application.
+Stop the application.
 
 ```bash
 #!/bin/bash
