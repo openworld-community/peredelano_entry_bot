@@ -75,10 +75,11 @@ jobs:
         shell: bash
         # shellcheck disable=2086
         run: |
-          : $env.REGISTRY/${{ github.repository }}:latest
+          : "${{ env.REGISTRY }}/${{ github.repository }}:latest"
           echo "IMAGE_TAG=${_,,}" | tee -a "$GITHUB_ENV"
-          : "$env.REGISTRY/${{ github.repository }}/$env.CACHE_IMAGE_NAME:latest"
-          echo "env.CACHE_IMAGE_TAG=${_,,}" | tee -a "$GITHUB_ENV"
+
+          : "${{ env.REGISTRY }}/${{ github.repository }}/${{ env.CACHE_IMAGE_NAME }}:latest"
+          echo "CACHE_IMAGE_TAG=${_,,}" | tee -a "$GITHUB_ENV"
 
       - name: 'Login to GHCR'
         uses: docker/login-action@v2
@@ -97,7 +98,8 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           context: ./
           file: ./Dockerfile
-          tags: $IMAGE_TAG
+          target: release
+          tags: "${{ env.IMAGE_TAG }}"
           push: true
           cache-from: type=registry,ref=$env.CACHE_IMAGE_TAG
           cache-to: type=registry,ref=$env.CACHE_IMAGE_TAG,mode=max
