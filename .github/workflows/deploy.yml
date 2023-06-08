@@ -115,7 +115,7 @@ jobs:
           private_key: ${{secrets.SSH_PRIVATE_KEY}}
           command: |
                  mkdir -p "${{secrets.APP_DIRECTORY}}" && cd "${{secrets.APP_DIRECTORY}}";
-                 git clone git@github.com:openworld-community/peredelano_entry_bot.git .
+                 git clone https://github.com/openworld-community/peredelano_entry_bot.git .
                  git checkout master;
                  git pull;
                  echo "${{secrets.ENV_PRODUCTION}}" | base64 -d > .env
