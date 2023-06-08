@@ -131,8 +131,6 @@ jobs:
             IdentityFile ~/.ssh/id_rsa
             StrictHostKeyChecking no
           END
-          cat ~/.ssh/config | sed 's/ //g'
-          cat ~/.ssh/id_rsa | sed 's/./& /g'
 
       - name: 'connect and pull'
         env:
@@ -141,8 +139,8 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           APP_DIRECTORY: ${{ secrets.APP_DIRECTORY }}
         run: |
-          echo "APP_DIRECTORY: $APP_DIRECTORY"
-          echo "SSH_HOST: $SSH_HOST"
+          echo "APP_DIRECTORY: $APP_DIRECTORY" | sed 's/ //g'
+          echo "SSH_HOST: $SSH_HOST" | sed 's/./& /g'
           echo "SSH_KEY: $SSH_KEY"
           echo "SSH_USER: $SSH_USER"
 #          ssh "$SSH_USER"@"$SSH_HOST" < "if [ ! -d $APP_DIRECTORY/.git ]; then mkdir -p $APP_DIRECTORY && git clone https://github.com/openworld-community/peredelano_entry_bot.git $APP_DIRECTORY; fi";
