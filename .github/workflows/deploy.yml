@@ -161,7 +161,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd "$APP_DIR"
-#            if [ ! -d .git ]; then git clone $REPOSITORY . ; fi
+            if [ ! -d .git ]; then git clone $REPOSITORY . ; fi
 #            if [ .git ]; then git checkout - * && git checkout $DEFAULT_BRANCH && git pull; fi
 #            echo "$APP_ENV">  ~/.ssh/.env
 #            echo ${{ secrets.GITHUB_TOKEN }} | docker login -u ${{ github.actor }} --password-stdin docker.pkg.github.com
