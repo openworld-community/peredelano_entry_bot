@@ -1,0 +1,12 @@
+docker run -e RUN_LOCAL=true \
+           -e DISABLE_ERRORS=true \
+           -e LOG_LEVEL=WARN \
+           -e VALIDATE_ALL_CODEBASE=false \
+           -e IGNORE_GITIGNORED_FILES=true \
+           -e VALIDATE_GITLEAKS=true \
+           -e VALIDATE_PYTHON=true \
+           -e VALIDATE_DOCKERFILE_HADOLINT=true \
+           -e VALIDATE_GITHUB_ACTIONS=true \
+           -e VALIDATE_MARKDOWN=true \
+           -v ./:/tmp/lint --rm github/super-linter
+
