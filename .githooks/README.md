@@ -4,7 +4,7 @@
 
 ### Installation
 
-Set path to the git hooks script directory at local repository on your workstation
+Set path to the git hooks script directory at local repository on your workstation.
 
 ```bash
 #!/bin/bash
@@ -12,7 +12,7 @@ cd <RepoDir>
 git config --local core.hooksPath .githooks
 ```
 
-Check changes at git configuration
+Check changes at git configuration.
 
 ```bash
 #!/bin/bash
@@ -21,7 +21,7 @@ git config --list --local |grep -i hooksPath
 
 ### Usage
 
-Make commit and git will call this local pre-commit hook
+Make commit and git will call this local pre-commit hook.
 
 ```bash
 #!/bin/bash
@@ -29,6 +29,13 @@ git commit -m "Local pre-commit hook check"
 ```
 
 Run syntax check manually
+
+```bash
+#!/bin/bash
+.githooks/pre-commit
+```
+
+or with some specified parameters.
 
 ```bash
 #!/bin/bash
