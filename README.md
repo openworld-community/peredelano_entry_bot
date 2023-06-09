@@ -35,11 +35,11 @@ Create new branch for you code with new feature/fix/refactoring.
 git checkout -b <MyNewBranch>
 ```
 
-Make sure that the local ".env" environment variable file contains all the necessary data. If necessary, make your own changes.
+Make sure that the local environment variable ".env"-file contains all the necessary data. If necessary, make your own changes.
 
 ```bash
 #!/bin/bash
-cat .env
+cat ./bot/secrets/.env_dev
 ```
 
 Pull latest docker image.
@@ -55,7 +55,7 @@ In other way you can build image locally. Change value of variable 'TAG' an '.en
 
 ```bash
 #!/bin/bash
-cat .env |grep -i tag
+cat ./bot/secrets/.env_dev |grep -i tag
 TAG=local
 ```
 

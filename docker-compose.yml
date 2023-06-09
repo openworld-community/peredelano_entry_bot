@@ -7,7 +7,7 @@ services:
     environment:
       COMPOSE_PROJECT_NAME: "${COMPOSE_PROJECT_NAME:-PEREDELANO_ENTRY_BOT}"
     env_file:
-      - .env
+      - ./bot/secrets/.env
     image: "ghcr.io/openworld-community/peredelano_entry_bot:${TAG:-latest}"
     build:
       context: ./

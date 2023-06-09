@@ -2,6 +2,8 @@ from dataclasses import dataclass
 
 from environs import Env
 
+PROJECT_STATUS = 'prod'
+
 @dataclass
 class TgBot:
     bot_token: str
@@ -29,7 +31,7 @@ def load_config(path: str | None = None) -> Config:
                                )
                   )
 
-
-config: Config = load_config('.env')
+config: Config = load_config('bot/secrets/.env_dev') if PROJECT_STATUS.lower() == 'test' else load_config(
+    'bot/secrets/.env')
 USERS_TABLE = config.tg_bot.supabase_users_table
 MAILING_TABLE = config.tg_bot.supabase_mailing_table
