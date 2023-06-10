@@ -69,7 +69,7 @@ jobs:
         run: pip install pylint
 
       - name: 'PyLint: running'
-        run: pylint --recursive=y --rcfile=./.pylintrc
+        run: pylint --rcfile=./.pylintrc
 
   hadoLint:
     name: 'hadoLint'
