@@ -19,4 +19,3 @@ override:
 strict-labels: boolean                  # true | false
 disable-ignore-pragma: boolean          # true | false
 trustedRegistries: string | [string]    # registry or list of registries
-

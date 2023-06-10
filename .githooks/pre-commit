@@ -6,9 +6,10 @@ docker run -e RUN_LOCAL=true \
            -e VALIDATE_GITLEAKS=true \
            -e VALIDATE_GITHUB_ACTIONS=true \
            -e VALIDATE_MARKDOWN=true \
+           -v ./:/tmp/lint \
            -e VALIDATE_DOCKERFILE_HADOLINT=true \
            -e DOCKERFILE_HADOLINT_FILE_NAME=.hadolint.yaml \
-           -v ./:/tmp/lint \
+           -v ./.hadolint.yaml:/action/lib/.automation/.hadolint.yaml \
            -e VALIDATE_PYTHON_PYLINT=true \
            -e PYTHON_PYLINT_CONFIG_FILE=.pylintrc \
            -v ./.pylintrc:/action/lib/.automation/.pylintrc \
