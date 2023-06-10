@@ -5,8 +5,6 @@ services:
   peredelano_entry_bot:
     environment:
       COMPOSE_PROJECT_NAME: "${COMPOSE_PROJECT_NAME:-LOCAL}"
-    env_file:
-      - ./bot/secrets/.env
     image: "ghcr.io/openworld-community/peredelano_entry_bot:${VERSION:-local}"
     build:
       context: ./
