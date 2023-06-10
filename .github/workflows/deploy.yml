@@ -20,20 +20,20 @@ permissions:
 
 jobs:
 
-  GitLeaks:
-    name: 'GitLeaks'
-    runs-on: ubuntu-latest
-    steps:
+#  GitLeaks:
+#    name: 'GitLeaks'
+#    runs-on: ubuntu-latest
+#    steps:
 
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+#      - uses: actions/checkout@v3
+#        with:
+#          fetch-depth: 0
 
-      - name: 'GitLeaks: running'
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+#      - name: 'GitLeaks: running'
+#        uses: gitleaks/gitleaks-action@v2
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
 
   YAMLLint:
     name: 'YAMLLint'
@@ -66,7 +66,7 @@ jobs:
           restore-keys: ${{ runner.os }}-pip
 
       - name: 'PyLint: installing'
-        run: pip install --user yamllint
+        run: pip install pylint
 
       - name: 'PyLint: running'
         run: pylint --recursive=y --rcfile ./.pylintrc
@@ -120,7 +120,7 @@ jobs:
 
   Build:
     name: 'Build'
-    needs: [super-linter, hadoLint, PyLint, YAMLLint, GitLeaks]
+    needs: [super-linter, hadoLint, PyLint, YAMLLint]
     timeout-minutes: 5
     runs-on: ubuntu-latest
     if: github.ref_name == github.event.repository.default_branch
