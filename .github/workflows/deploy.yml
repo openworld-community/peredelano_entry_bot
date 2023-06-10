@@ -190,7 +190,7 @@ jobs:
           script: |
             if [[ ! -d "${{ github.event.repository.name }}/.git" ]]; then git clone ${{ github.server_url }}/${{ github.repository }} ${{ github.event.repository.name }} ; fi
             if [[ -d "${{ github.event.repository.name }}/.git" ]]; then cd ${{ github.event.repository.name }} && git checkout ${{ github.ref_name }} && git pull ; fi
-            echo "$APP_ENV">  ./bot/secrets/.env
+            echo "$APP_ENV">  .env
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker compose --file docker-compose.yml pull
             #docker compose --file docker-compose.yml build --pull --no-cache;
