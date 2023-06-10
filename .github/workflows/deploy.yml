@@ -69,7 +69,8 @@ jobs:
         run: pip install pylint
 
       - name: 'PyLint: running'
-        run: pylint --rcfile=./.pylintrc **/*.py
+        # shellcheck disable=SC2035
+        run: pylint --rcfile=./.pylintrc ./
 
   hadoLint:
     name: 'hadoLint'
