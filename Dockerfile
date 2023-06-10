@@ -1,13 +1,24 @@
-FROM python:3.10
+####
+FROM python:3.10-slim AS builder
+
+RUN apt-get update -y; \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 COPY requirements.txt .
 
-RUN pip install --upgrade pip
+# hadolint ignore=DL3013
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir --requirement requirements.txt; \
+       apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN pip install -r requirements.txt
+CMD [ "python", "run.py" ]
+
+####
+FROM builder AS release
 
 COPY . .
 
 CMD [ "python", "run.py" ]
+

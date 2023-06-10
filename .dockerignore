@@ -3,6 +3,8 @@ tests/
 # Git
 .git
 .gitignore
+.githooks
+.github
 
 # CI
 .codeclimate.yml
@@ -10,7 +12,9 @@ tests/
 .taskcluster.yml
 
 # Docker
-docker-compose.yml
+.dockerignore
+Dockerfile*
+*docker-compose*yml
 .docker
 
 # Byte-compiled / optimized / DLL files
@@ -29,6 +33,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
+.env
 build/
 develop-eggs/
 dist/

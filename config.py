@@ -4,7 +4,6 @@ from environs import Env
 
 PROJECT_STATUS = 'prod'
 
-
 @dataclass
 class TgBot:
     bot_token: str
@@ -31,7 +30,6 @@ def load_config(path: str | None = None) -> Config:
                                admins_list=list(map(int, env.list("ADMINS"))),
                                )
                   )
-
 
 config: Config = load_config('bot/secrets/.env_dev') if PROJECT_STATUS.lower() == 'test' else load_config(
     'bot/secrets/.env')
