@@ -33,7 +33,7 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE}}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
 
   YAMLLint:
     name: 'YAMLLint'
@@ -66,8 +66,7 @@ jobs:
           restore-keys: ${{ runner.os }}-pip
 
       - name: 'PyLint: installing'
-        #run: python -m pip pylint
-         run: pip install --user yamllint
+        run: pip install --user yamllint
 
       - name: 'PyLint: running'
         run: pylint --recursive=y --rcfile ./.pylintrc
