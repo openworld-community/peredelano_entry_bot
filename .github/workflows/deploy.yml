@@ -20,26 +20,87 @@ permissions:
 
 jobs:
 
-  lint:
-    name: 'Checking code syntax'
+  GitLeaks:
+    name: 'GitLeaks'
     runs-on: ubuntu-latest
-
     steps:
 
-      - name: 'Checkout Code'
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: 'GitLeaks: running'
+        uses: gitleaks/gitleaks-action@v2
+
+  YAMLLint:
+    name: 'YAMLLint'
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2.3.4
+
+      #- name: Installing PyLint
+      #  run: python -m pip install yamllint
+
+      - name: 'YAMLLint: runing'
+        run: yamllint -c .yamllint.yml .
+
+  PyLint:
+    name: 'PyLint'
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2.3.4
+
+      - name: 'PyLint: set up python'
+        uses: actions/setup-python@v2
+
+      - name: 'PyLint: loading cache (if exists)'
+        uses: actions/cache@v2.1.3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip
+          restore-keys: ${{ runner.os }}-pip
+
+      - name: 'PyLint: installing'
+        run: python -m pip pylint
+
+      - name: 'PyLint: running'
+        run: pylint --recursive=y --rcfile ./.pylintrc
+
+  hadoLint:
+    name: 'hadoLint'
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: 'hadoLint: runing'
+        uses: hadolint/hadolint-action@master
+        with:
+          dockerfile: "Dockerfile"
+          recursive: true
+          config: ./.hadolint.yaml
+
+  super-linter:
+    name: 'super-linter'
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: 'super-linter: checkout code'
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Set only difference of code validation for other branches
+      - name: 'super-linter: set validating only diff'
         if: github.ref_name != github.event.repository.default_branch
         run: echo "VALIDATE_ALL_CODEBASE=false" >> "$GITHUB_ENV"
 
-      - name: Set all code validation flag for default branch
+      - name: 'super-linter: set validating all code'
         if: github.ref_name == github.event.repository.default_branch
         run: echo "VALIDATE_ALL_CODEBASE=true" >> "$GITHUB_ENV"
 
-      - name: 'Runing super-linter'
+      - name: 'super-linter: runing'
         uses: github/super-linter@v4
         env:
           DISABLE_ERRORS: false
@@ -54,9 +115,9 @@ jobs:
           VALIDATE_GITHUB_ACTIONS: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build-and-push:
-    name: 'Building image and push it to registry'
-    needs: lint
+  Build:
+    name: 'Build'
+    needs: [super-linter, hadoLint, PyLint, YAMLLint, GitLeaks]
     timeout-minutes: 5
     runs-on: ubuntu-latest
     if: github.ref_name == github.event.repository.default_branch
@@ -64,13 +125,12 @@ jobs:
       REGISTRY: ghcr.io
       TAG_NAME: latest
       CACHE_IMAGE_NAME: buildcache
-
     steps:
 
-      - name: 'Checkout Code'
+      - name: 'Build: checkout code'
         uses: actions/checkout@v3
 
-      - name: 'Export lowercase image names'
+      - name: 'Build: export lowercase image names'
         shell: bash
         # shellcheck disable=cs2086
         run: |
@@ -78,18 +138,18 @@ jobs:
           echo "IMAGE_TAG=${_,,}" | tee -a "$GITHUB_ENV"
           : "${{ env.REGISTRY }}/${{ github.repository }}/${{ env.CACHE_IMAGE_NAME }}:latest"
           echo "CACHE_IMAGE_TAG=${_,,}" | tee -a "$GITHUB_ENV"
-      - name: 'Login to GHCR'
+      - name: 'Build: login to GHCR'
         uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 'Set up Docker Buildx'
+      - name: 'Build: set up docker Buildx'
         id: buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: 'Build and push docker image'
+      - name: 'Build: build and push docker image'
         uses: docker/build-push-action@v3
         with:
           builder: ${{ steps.buildx.outputs.name }}
@@ -101,18 +161,18 @@ jobs:
           cache-from: type=registry,ref=${{ env.CACHE_IMAGE_TAG }}
           cache-to: type=registry,ref=${{ env.CACHE_IMAGE_TAG }},mode=max
 
-  deployment:
-    name: 'Deploing changes'
-    needs: build-and-push
+  release:
+    name: 'Release'
+    needs: Build
     runs-on: ubuntu-latest
     if: github.ref_name == github.event.repository.default_branch
     environment: production
     steps:
 
-      - name: 'Checkout code'
+      - name: 'Release: checkout code'
         uses: actions/checkout@v3
 
-      - name: 'Checkout and reloading application'
+      - name: 'Release: checkout and reloading application'
         uses: appleboy/ssh-action@master
         env:
           APP_ENV: ${{ secrets.ENV_PRODUCTION }}
@@ -133,4 +193,3 @@ jobs:
             docker compose --file docker-compose.yml up -d
             docker system prune --all --force;
             docker logout
-
