@@ -20,6 +20,7 @@ permissions:
 
 jobs:
 
+
 #  GitLeaks:
 #    name: 'GitLeaks'
 #    runs-on: ubuntu-latest
@@ -32,6 +33,7 @@ jobs:
 #        env:
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
 
   MyPy:
     name: 'MyPy'
@@ -51,13 +53,11 @@ jobs:
           restore-keys: ${{ runner.os }}-pip
 
       - name: 'Installing'
-        run: |
-          pip install mypy
-          mypy --install-types
+        run: pip install mypy
 
       - name: 'Running'
-        run: |
-          mypy --config-file .mypy.ini ./
+        run: mypy --config-file .mypy.ini ./
+
 
   YAMLLint:
     name: 'YAMLLint'
@@ -66,11 +66,12 @@ jobs:
 
       - uses: actions/checkout@v2.3.4
 
-      - name: 'YAMLLint: installing'
+      - name: 'Installing'
         run: python -m pip install yamllint
 
-      - name: 'YAMLLint: runing'
+      - name: 'Running'
         run: yamllint -c .yamllint.yml .
+
 
   hadoLint:
     name: 'hadoLint'
@@ -79,12 +80,13 @@ jobs:
 
       - uses: actions/checkout@v2
 
-      - name: 'hadoLint: runing'
+      - name: 'Running'
         uses: hadolint/hadolint-action@master
         with:
           dockerfile: "Dockerfile"
           recursive: true
           config: ./.hadolint.yaml
+
 
   Build:
     name: 'Build'
@@ -98,10 +100,9 @@ jobs:
       CACHE_IMAGE_NAME: buildcache
     steps:
 
-      - name: 'Build: checkout code'
         uses: actions/checkout@v3
 
-      - name: 'Build: export lowercase image names'
+      - name: 'Exporting lowercase image names'
         shell: bash
         # shellcheck disable=cs2086
         run: |
@@ -116,11 +117,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 'Build: set up docker Buildx'
+      - name: 'Set up docker Buildx'
         id: buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: 'Build: build and push docker image'
+      - name: 'Building and push docker image'
         uses: docker/build-push-action@v3
         with:
           builder: ${{ steps.buildx.outputs.name }}
@@ -132,7 +133,8 @@ jobs:
           cache-from: type=registry,ref=${{ env.CACHE_IMAGE_TAG }}
           cache-to: type=registry,ref=${{ env.CACHE_IMAGE_TAG }},mode=max
 
-  release:
+
+  Release:
     name: 'Release'
     needs: Build
     runs-on: ubuntu-latest
@@ -140,10 +142,9 @@ jobs:
     environment: production
     steps:
 
-      - name: 'Release: checkout code'
         uses: actions/checkout@v3
 
-      - name: 'Release: checkout and reloading application'
+      - name: 'Checkout and reloading application'
         uses: appleboy/ssh-action@master
         env:
           APP_ENV: ${{ secrets.ENV_PRODUCTION }}
