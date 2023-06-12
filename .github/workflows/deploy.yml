@@ -100,7 +100,7 @@ jobs:
       CACHE_IMAGE_NAME: buildcache
     steps:
 
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: 'Exporting lowercase image names'
         shell: bash
@@ -142,7 +142,7 @@ jobs:
     environment: production
     steps:
 
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: 'Checkout and reloading application'
         uses: appleboy/ssh-action@master
