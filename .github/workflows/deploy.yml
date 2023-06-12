@@ -51,7 +51,9 @@ jobs:
           restore-keys: ${{ runner.os }}-pip
 
       - name: 'Installing'
-        run: pip install mypy
+        run: |
+          pip install mypy
+          mypy --install-types
 
       - name: 'Running'
         run: |
