@@ -24,16 +24,38 @@ jobs:
 #    name: 'GitLeaks'
 #    runs-on: ubuntu-latest
 #    steps:
-
 #      - uses: actions/checkout@v3
 #        with:
 #          fetch-depth: 0
-
 #      - name: 'GitLeaks: running'
 #        uses: gitleaks/gitleaks-action@v2
 #        env:
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+  MyPy:
+    name: 'MyPy'
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2.3.4
+
+      - name: 'Set up python'
+        uses: actions/setup-python@v2
+
+      - name: 'Loading cache (if exists)'
+        uses: actions/cache@v2.1.3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip
+          restore-keys: ${{ runner.os }}-pip
+
+      - name: 'Installing'
+        run: pip install mypy
+
+      - name: 'Running'
+        run: |
+          mypy --config-file .mypy.ini ./
 
   YAMLLint:
     name: 'YAMLLint'
@@ -47,30 +69,6 @@ jobs:
 
       - name: 'YAMLLint: runing'
         run: yamllint -c .yamllint.yml .
-
-  PyLint:
-    name: 'PyLint'
-    runs-on: ubuntu-latest
-    steps:
-
-      - uses: actions/checkout@v2.3.4
-
-      - name: 'PyLint: set up python'
-        uses: actions/setup-python@v2
-
-      - name: 'PyLint: loading cache (if exists)'
-        uses: actions/cache@v2.1.3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip
-          restore-keys: ${{ runner.os }}-pip
-
-      - name: 'PyLint: installing'
-        run: pip install pylint
-
-      - name: 'PyLint: running'
-        # shellcheck disable=SC2035
-        run: pylint --rcfile=./.pylintrc ./
 
   hadoLint:
     name: 'hadoLint'
@@ -86,42 +84,9 @@ jobs:
           recursive: true
           config: ./.hadolint.yaml
 
-  super-linter:
-    name: 'super-linter'
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: 'super-linter: checkout code'
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: 'super-linter: set validating only diff'
-        if: github.ref_name != github.event.repository.default_branch
-        run: echo "VALIDATE_ALL_CODEBASE=false" >> "$GITHUB_ENV"
-
-      - name: 'super-linter: set validating all code'
-        if: github.ref_name == github.event.repository.default_branch
-        run: echo "VALIDATE_ALL_CODEBASE=true" >> "$GITHUB_ENV"
-
-      - name: 'super-linter: runing'
-        uses: github/super-linter@v4
-        env:
-          DISABLE_ERRORS: false
-          LOG_LEVEL: WARN
-          VALIDATE_ALL_CODEBASE: "${{ env.VALIDATE_ALL_CODEBASE }}"
-          IGNORE_GITIGNORED_FILES: true
-          VALIDATE_GITLEAKS: true
-          VALIDATE_DOCKERFILE_HADOLINT: true
-          VALIDATE_PYTHON: true
-          VALIDATE_YAML: true
-          VALIDATE_MARKDOWN: true
-          VALIDATE_GITHUB_ACTIONS: true
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   Build:
     name: 'Build'
-    needs: [super-linter, hadoLint, PyLint, YAMLLint]
+    needs: [MyPy, YAMLLint, hadoLint]
     timeout-minutes: 5
     runs-on: ubuntu-latest
     if: github.ref_name == github.event.repository.default_branch
