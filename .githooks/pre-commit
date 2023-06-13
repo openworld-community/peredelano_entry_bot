@@ -8,11 +8,8 @@ docker run -e DISABLE_ERRORS=true \
            -v .:/tmp/lint:ro \
            -e VALIDATE_PYTHON_MYPY=true \
            -e PYTHON_MYPY_CONFIG_FILE=.mypy.ini \
-           -v .mypy.ini:/action/lib/.automation/.mypy.ini:ro \
            -e VALIDATE_DOCKERFILE_HADOLINT=true \
            -e DOCKERFILE_HADOLINT_FILE_NAME=.hadolint.yaml \
-           -v .hadolint.yaml:/action/lib/.automation/.hadolint.yaml:ro \
            -e VALIDATE_YAML=true \
            -e YAML_CONFIG_FILE=.yamllint.yml \
-           -v .yamllint.yml:/action/lib/.automation/.yamllint.yml:ro \
-           -e RUN_LOCAL=true --rm github/super-linter
+           -e LINTER_RULES_PATH=/ -e RUN_LOCAL=true --rm github/super-linter
