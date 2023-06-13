@@ -16,6 +16,7 @@ async def show_mailing_summary(data: dict, kb_builder: KeyboardBuilder[ButtonTyp
              f'<b>Сообщение</b>:\n\n{data.get("mailing_message", "Данные не получены")}',
         reply_markup=kb_builder.as_markup(resize_keyboard=True), )
 
+
 async def select_profiles_for_mailing(completed_profiles, data, uncompleted_profiles):
     if data['to_whom'].lower() == "заполнил профиль":
         return completed_profiles
@@ -49,4 +50,4 @@ async def mailing_list_summary(active_users_list: list[str], blocked_users_list:
     await message.answer(f'Рассылка завершена!\n\n'
                          f'Активных пользователей: <b>{active_users}</b> ({round(pau, 2)}%)\n'
                          f'Заблокировавших бота: <b>{users_who_blocked_bot}</b> ({round(pbu, 2)}%)',
-                         reply_markup=ReplyKeyboardRemove(), )
+                         reply_markup=ReplyKeyboardRemove(remove_keyboard=True), )

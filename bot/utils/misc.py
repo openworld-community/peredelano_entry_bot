@@ -40,9 +40,9 @@ async def get_userdata(message) -> tuple[str, str, str]:
 async def get_datetime() -> tuple[str, int]:
     now = datetime.now()
     timestamptz = now.astimezone(pytz.timezone('UTC'))
-    timestamptz = timestamptz.strftime("%Y-%m-%d %H:%M:%S %Z")
+    formatted_timestamptz = timestamptz.strftime("%Y-%m-%d %H:%M:%S %Z")
     start_time = int(time.time())
-    return timestamptz, start_time
+    return formatted_timestamptz, start_time
 
 
 def check_string(input_string):
