@@ -6,3 +6,4 @@ venv/
 __pycache__/
 /tests/
 /.env
+/mypy_checks/
