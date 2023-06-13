@@ -5,3 +5,4 @@ bot/secrets/.env_dev
 venv/
 __pycache__/
 /tests/
+/.env
