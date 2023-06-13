@@ -1,4 +1,4 @@
-from aiogram import Router, Bot, Dispatcher
+from aiogram import Router, Bot, Dispatcher  # type: ignore
 from supabase import Client, create_client
 
 from config import config
