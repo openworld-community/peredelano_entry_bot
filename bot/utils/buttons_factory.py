@@ -1,9 +1,9 @@
 from aiogram.types import KeyboardButton, InlineKeyboardButton
-from aiogram.utils.keyboard import ReplyKeyboardBuilder, KeyboardBuilder, ButtonType, InlineKeyboardBuilder
+from aiogram.utils.keyboard import ReplyKeyboardBuilder, KeyboardBuilder, InlineKeyboardBuilder
 
 
-async def create_buttons(btn_names: list, width: int = 2) -> KeyboardBuilder[ButtonType]:
-    kb_builder: ReplyKeyboardBuilder = ReplyKeyboardBuilder()
+async def create_buttons(btn_names: list, width: int = 2) -> KeyboardBuilder[KeyboardButton]:
+    kb_builder = ReplyKeyboardBuilder()
     buttons: list[KeyboardButton] = [KeyboardButton(text=i) for i in btn_names]
     return kb_builder.row(*buttons, width=width)
 

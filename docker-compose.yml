@@ -1,4 +1,4 @@
-version: '3.5'
+version: '3.7'
 
 services:
 
@@ -6,12 +6,12 @@ services:
     container_name: "peredelano_entry_bot"
     environment:
       COMPOSE_PROJECT_NAME: "${COMPOSE_PROJECT_NAME:-PEREDELANO_ENTRY_BOT}"
+      VERSION: latest
     env_file:
-      - ./bot/secrets/.env
-    image: "ghcr.io/openworld-community/peredelano_entry_bot:${TAG:-latest}"
+      - .env
+    image: "ghcr.io/openworld-community/peredelano_entry_bot:${VERSION:-latest}"
     build:
       context: ./
       dockerfile: Dockerfile
       target: release
     restart: "${DOCKER_RESTART_POLICY:-always}"
-

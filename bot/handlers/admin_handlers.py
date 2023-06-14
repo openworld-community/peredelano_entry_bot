@@ -2,6 +2,7 @@ from aiogram import F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
+from loguru import logger
 
 from config import config
 from bot.db.database import get_all_tg_ids, insert_mailing_message_to_db
@@ -18,18 +19,18 @@ from bot.utils.mailing_list import select_profiles_for_mailing, start_mailing, m
 async def admin_start(message: Message, state: FSMContext) -> None:
     await state.set_state(Admin.mailing_message)
     kb_builder = await create_buttons(["Создать рассылку"])
-    await message.answer(text=RU_ADMIN_HANDLERS['hello_admin'],
+    await message.answer(text=str(RU_ADMIN_HANDLERS['hello_admin']),
                          reply_markup=kb_builder.as_markup(resize_keyboard=True), )
 
 
 # WRITE MAILING MESSAGE
 @admin_router.message(Admin.mailing_message, F.text.casefold() == "создать рассылку",
                       F.from_user.id.in_({*config.tg_bot.admins_list}))
-async def choose_mailing_list_type(message: Message, state: FSMContext) -> None:
+async def write_mailing_message(message: Message, state: FSMContext) -> None:
     await state.set_state(Admin.choose_sending_type)
     await message.answer(
         text=RU_ADMIN_HANDLERS['write_mailing_message'],
-        reply_markup=ReplyKeyboardRemove(), )
+        reply_markup=ReplyKeyboardRemove(remove_keyboard=True), )
 
 
 # CREATE MAILING LIST
@@ -68,16 +69,21 @@ async def notify_users(message: Message, state: FSMContext):
 
     if uncompleted_profiles + completed_profiles == []:
         await state.clear()
-        return await message.answer('Пользователей нет, рассылать некому.', reply_markup=ReplyKeyboardRemove())
+        return await message.answer('Пользователей нет, рассылать некому.',
+                                    reply_markup=ReplyKeyboardRemove(remove_keyboard=True))
 
     await message.answer(
         text=RU_ADMIN_HANDLERS['mailing_has_started'],
-        reply_markup=ReplyKeyboardRemove(), )
+        reply_markup=ReplyKeyboardRemove(remove_keyboard=True), )
 
     data = await state.get_data()
-    author_tg_id, author, mailing_message = message.from_user.id, message.from_user.full_name, data['mailing_message']
 
-    await insert_mailing_message_to_db(author_tg_id, author, mailing_message)
+    if message.from_user is not None:
+        author_tg_id, author, mailing_message = message.from_user.id, message.from_user.full_name, data[
+            'mailing_message']
+        await insert_mailing_message_to_db(author_tg_id, author, mailing_message)
+    else:
+        logger.error('id пользователя равно None, вставка в БД невозможна')
 
     user_ids = await select_profiles_for_mailing(completed_profiles, data, uncompleted_profiles)
 
