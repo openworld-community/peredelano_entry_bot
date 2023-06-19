@@ -7,11 +7,16 @@ from loguru import logger
 from config import config
 from bot.db.database import get_all_tg_ids, insert_mailing_message_to_db
 from bot.dependencies import admin_router
+from bot.handlers.common_handlers import cancel_handler
 from bot.fsm import Admin
 from bot.lang_ru import RU_ADMIN_HANDLERS
 from bot.utils.buttons_factory import create_buttons
 from bot.utils.mailing_list import select_profiles_for_mailing, start_mailing, mailing_list_summary, \
     show_mailing_summary
+
+
+async def cancel_in_write_mailing_message(message: Message, state: FSMContext) -> None:
+    await cancel_handler(message, state)
 
 
 # ADMIN START
@@ -36,6 +41,9 @@ async def write_mailing_message(message: Message, state: FSMContext) -> None:
 # CREATE MAILING LIST
 @admin_router.message(Admin.choose_sending_type, F.from_user.id.in_({*config.tg_bot.admins_list}))
 async def choose_mailing_list_type(message: Message, state: FSMContext) -> None:
+    if message.text in ['/cancel', 'отмена', 'Отмена']:
+        await cancel_in_write_mailing_message(message, state)
+        return
     await state.set_state(Admin.submit_sending)
     await state.update_data(mailing_message=message.text)
     kb_builder = await create_buttons(['Заполнил профиль', 'Не заполнил профиль', 'Всем'], width=2)
