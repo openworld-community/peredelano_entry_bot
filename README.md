@@ -39,7 +39,7 @@ Make sure that the local environment variable ".env"-file contains all the neces
 
 ```bash
 #!/bin/bash
-cat ./bot/secrets/.env_dev
+cat ./bot/secrets/.env
 ```
 
 Pull latest docker image.
@@ -55,7 +55,7 @@ In other way you can build image locally. Change value of variable 'TAG' an '.en
 
 ```bash
 #!/bin/bash
-cat ./bot/secrets/.env_dev |grep -i tag
+cat ./bot/secrets/.env |grep -i tag
 TAG=local
 ```
 
