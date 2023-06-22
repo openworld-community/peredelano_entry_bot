@@ -35,7 +35,7 @@ async def get_role(message: Message, state: FSMContext) -> None:
 
 
 # ОПЫТ
-@user_router.message(UserForm.experience)
+@user_router.message(UserForm.experience, F.text)
 async def indicate_experience(message: Message, state: FSMContext) -> None:
     await state.set_state(UserForm.tech_stack)
     await state.update_data(role=message.text)
@@ -55,7 +55,7 @@ async def choose_tech_stack(message: Message, state: FSMContext) -> None:
 
 
 # SUMMARY
-@user_router.message(UserForm.summary)
+@user_router.message(UserForm.summary, F.text)
 async def get_summary(message: Message, state: FSMContext) -> None:
     await state.set_state(UserForm.telegram_link)
     await state.update_data(tech_stack=message.text)

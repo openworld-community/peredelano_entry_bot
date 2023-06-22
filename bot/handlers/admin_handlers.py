@@ -34,7 +34,7 @@ async def write_mailing_message(message: Message, state: FSMContext) -> None:
 
 
 # CREATE MAILING LIST
-@admin_router.message(AdminForm.choose_sending_type, F.from_user.id.in_({*config.tg_bot.admins_list}))
+@admin_router.message(AdminForm.choose_sending_type, F.from_user.id.in_({*config.tg_bot.admins_list}), F.text)
 async def choose_mailing_list_type(message: Message, state: FSMContext) -> None:
     await state.set_state(AdminForm.submit_sending)
     await state.update_data(mailing_message=message.text)
