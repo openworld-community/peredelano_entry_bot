@@ -8,6 +8,7 @@ from aiogram.types import Message, ReplyKeyboardRemove
 from bot.dependencies import other_router
 from bot.lang_ru import RU_OTHER_HANDLERS
 
+
 # ОТМЕНА
 @other_router.message(Command("cancel"))
 @other_router.message(F.text.casefold() == "отмена")
