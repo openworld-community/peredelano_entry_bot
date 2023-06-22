@@ -6,7 +6,7 @@ from datetime import datetime
 import pytz
 from aiogram.utils.keyboard import KeyboardBuilder, ButtonType
 
-from bot.lang_ru import RU_COMMON_HANDLERS
+from bot.lang_ru import RU_USER_HANDLERS
 
 
 def check_eventloop_policy() -> None:
@@ -16,7 +16,7 @@ def check_eventloop_policy() -> None:
 
 async def show_dev_summary(data: dict, kb_builder: KeyboardBuilder[ButtonType], message) -> None:
     await message.answer(
-        text=f'{RU_COMMON_HANDLERS["summary"]}'
+        text=f'{RU_USER_HANDLERS["summary"]}'
 
              f'Роль: {data.get("role", "Данные не получены")}\n'
              f'Опыт: {data.get("experience", "Данные не получены")}\n'

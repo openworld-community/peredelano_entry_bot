@@ -7,7 +7,7 @@ from loguru import logger
 from config import config
 from bot.db.database import get_all_tg_ids, insert_mailing_message_to_db
 from bot.dependencies import admin_router
-from bot.fsm import Admin
+from bot.fsm import AdminForm
 from bot.lang_ru import RU_ADMIN_HANDLERS
 from bot.utils.buttons_factory import create_buttons
 from bot.utils.mailing_list import select_profiles_for_mailing, start_mailing, mailing_list_summary, \
@@ -17,26 +17,26 @@ from bot.utils.mailing_list import select_profiles_for_mailing, start_mailing, m
 # ADMIN START
 @admin_router.message(Command("admin"), F.from_user.id.in_({*config.tg_bot.admins_list}))
 async def admin_start(message: Message, state: FSMContext) -> None:
-    await state.set_state(Admin.mailing_message)
+    await state.set_state(AdminForm.mailing_message)
     kb_builder = await create_buttons(["Создать рассылку"])
     await message.answer(text=str(RU_ADMIN_HANDLERS['hello_admin']),
                          reply_markup=kb_builder.as_markup(resize_keyboard=True), )
 
 
 # WRITE MAILING MESSAGE
-@admin_router.message(Admin.mailing_message, F.text.casefold() == "создать рассылку",
+@admin_router.message(AdminForm.mailing_message, F.text.casefold() == "создать рассылку",
                       F.from_user.id.in_({*config.tg_bot.admins_list}))
 async def write_mailing_message(message: Message, state: FSMContext) -> None:
-    await state.set_state(Admin.choose_sending_type)
+    await state.set_state(AdminForm.choose_sending_type)
     await message.answer(
         text=RU_ADMIN_HANDLERS['write_mailing_message'],
         reply_markup=ReplyKeyboardRemove(remove_keyboard=True), )
 
 
 # CREATE MAILING LIST
-@admin_router.message(Admin.choose_sending_type, F.from_user.id.in_({*config.tg_bot.admins_list}))
+@admin_router.message(AdminForm.choose_sending_type, F.from_user.id.in_({*config.tg_bot.admins_list}))
 async def choose_mailing_list_type(message: Message, state: FSMContext) -> None:
-    await state.set_state(Admin.submit_sending)
+    await state.set_state(AdminForm.submit_sending)
     await state.update_data(mailing_message=message.text)
     kb_builder = await create_buttons(['Заполнил профиль', 'Не заполнил профиль', 'Всем'], width=2)
     await message.answer(
@@ -45,21 +45,21 @@ async def choose_mailing_list_type(message: Message, state: FSMContext) -> None:
 
 
 # SUBMIT MAILING LIST
-@admin_router.message(Admin.submit_sending, F.text.casefold() == "заполнил профиль",
+@admin_router.message(AdminForm.submit_sending, F.text.casefold() == "заполнил профиль",
                       F.from_user.id.in_({*config.tg_bot.admins_list}))
-@admin_router.message(Admin.submit_sending, F.text.casefold() == "не заполнил профиль",
+@admin_router.message(AdminForm.submit_sending, F.text.casefold() == "не заполнил профиль",
                       F.from_user.id.in_({*config.tg_bot.admins_list}))
-@admin_router.message(Admin.submit_sending, F.text.casefold() == "всем",
+@admin_router.message(AdminForm.submit_sending, F.text.casefold() == "всем",
                       F.from_user.id.in_({*config.tg_bot.admins_list}))
 async def submit_sending(message: Message, state: FSMContext) -> None:
-    await state.set_state(Admin.start_sending)
+    await state.set_state(AdminForm.start_sending)
     await state.update_data(to_whom=message.text)
     data = await state.get_data()
     kb_builder = await create_buttons(['Начать рассылку', 'Отмена'], width=2)
     await show_mailing_summary(data, kb_builder, message)
 
 
-@admin_router.message(Admin.start_sending, F.text.casefold() == "начать рассылку",
+@admin_router.message(AdminForm.start_sending, F.text.casefold() == "начать рассылку",
                       F.from_user.id.in_({*config.tg_bot.admins_list}))
 async def notify_users(message: Message, state: FSMContext):
     message_pool = 10
