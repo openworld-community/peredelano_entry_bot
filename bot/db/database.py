@@ -13,6 +13,7 @@ async def upsert_final_data_to_db(state: FSMContext, db_table: str) -> None:
     role = data.get("role", "Данные не получены")
     experience = data.get("experience", "Данные не получены")
     tech_stack = data.get("tech_stack", "Данные не получены")
+    linkedin_profile = data.get("linkedin_profile", "Данные не получены")
     submit = data.get("submit", "No")
     total_time = await calc_total_time(data)
 
@@ -20,6 +21,7 @@ async def upsert_final_data_to_db(state: FSMContext, db_table: str) -> None:
             'role': role,
             'experience': experience,
             'tech_stack': tech_stack,
+            'linkedin_profile': linkedin_profile,
             'submit': submit,
             'total_time_in_sec': total_time}
 

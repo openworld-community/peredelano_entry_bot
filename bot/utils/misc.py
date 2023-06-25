@@ -1,4 +1,5 @@
 import asyncio
+import re
 import sys
 import time
 from datetime import datetime
@@ -15,12 +16,14 @@ def check_eventloop_policy() -> None:
 
 
 async def show_dev_summary(data: dict, kb_builder: KeyboardBuilder[ButtonType], message) -> None:
+    display_linkedin = data.get("linkedin_profile")
     await message.answer(
         text=f'{RU_USER_HANDLERS["summary"]}'
 
              f'Роль: {data.get("role", "Данные не получены")}\n'
              f'Опыт: {data.get("experience", "Данные не получены")}\n'
-             f'Стек: {data.get("tech_stack", "Данные не получены")}',
+             f'Стек: {data.get("tech_stack", "Данные не получены")}\n'
+             f'LinkedIn: {display_linkedin if display_linkedin else "Данные не получены" }',
         reply_markup=kb_builder.as_markup(resize_keyboard=True), )
 
 
@@ -43,6 +46,11 @@ async def get_datetime() -> tuple[str, int]:
     formatted_timestamptz = timestamptz.strftime("%Y-%m-%d %H:%M:%S %Z")
     start_time = int(time.time())
     return formatted_timestamptz, start_time
+
+
+async def get_linkedin_link(link: str) -> str:
+    pattern = "^https://(www.)?linkedin.com/.+$"
+    return link if re.match(pattern, link) else None
 
 
 def check_string(input_string):

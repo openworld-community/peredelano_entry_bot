@@ -5,7 +5,7 @@ docker run -e DISABLE_ERRORS=true \
            -e VALIDATE_GITLEAKS=true \
            -e VALIDATE_GITHUB_ACTIONS=true \
            -e VALIDATE_MARKDOWN=true \
-           -v .:/tmp/lint:ro \
+           -v ${PWD}/:/tmp/lint:ro \
            -e VALIDATE_PYTHON_MYPY=true \
            -e PYTHON_MYPY_CONFIG_FILE=.mypy.ini \
            -e VALIDATE_DOCKERFILE_HADOLINT=true \

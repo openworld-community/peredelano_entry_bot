@@ -7,3 +7,4 @@ __pycache__/
 /tests/
 /.env
 /mypy_checks/
+.idea/

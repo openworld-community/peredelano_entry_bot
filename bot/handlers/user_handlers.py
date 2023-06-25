@@ -11,7 +11,7 @@ from bot.db.database import upsert_final_data_to_db, collect_initial_data_from_u
 from bot.dependencies import user_router
 from bot.fsm import UserForm
 from bot.lang_ru import RU_USER_HANDLERS, RU_COMMON_HANDLERS_BUTTONS
-from bot.utils.misc import show_dev_summary
+from bot.utils.misc import show_dev_summary, get_linkedin_link
 
 
 # START
@@ -48,17 +48,29 @@ async def indicate_experience(message: Message, state: FSMContext) -> None:
 # СТЕК
 @user_router.message(UserForm.tech_stack, F.text.in_({*RU_COMMON_HANDLERS_BUTTONS['choose_experience']}))
 async def choose_tech_stack(message: Message, state: FSMContext) -> None:
-    await state.set_state(UserForm.summary)
+    await state.set_state(UserForm.linkedin_profile)
     await state.update_data(experience=message.text)
     await message.answer(
         text=RU_USER_HANDLERS['choose_tech_stack'], reply_markup=ReplyKeyboardRemove(remove_keyboard=True), )
+
+
+# LinkedIn
+@user_router.message(UserForm.linkedin_profile, F.text)
+async def give_linkedin_link(message: Message, state: FSMContext) -> None:
+    await state.set_state(UserForm.summary)
+    await state.update_data(tech_stack=message.text)
+    kb_builder = await create_buttons(RU_COMMON_HANDLERS_BUTTONS['skip_linkedin'], width=3)
+    await message.answer(
+        text=RU_USER_HANDLERS['give_linkedin_link'],
+        reply_markup=kb_builder.as_markup(resize_keyboard=True),
+    )
 
 
 # SUMMARY
 @user_router.message(UserForm.summary, F.text)
 async def get_summary(message: Message, state: FSMContext) -> None:
     await state.set_state(UserForm.telegram_link)
-    await state.update_data(tech_stack=message.text)
+    await state.update_data(linkedin_profile=await get_linkedin_link(message.text))
     data = await state.get_data()
     kb_builder = await create_buttons(["Подтвердить", "Отмена"])
     await show_dev_summary(data, kb_builder, message)
