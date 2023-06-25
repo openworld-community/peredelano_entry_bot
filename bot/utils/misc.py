@@ -48,7 +48,7 @@ async def get_datetime() -> tuple[str, int]:
     return formatted_timestamptz, start_time
 
 
-async def get_linkedin_link(link: str) -> str:
+async def get_linkedin_link(link: str):
     pattern = "^https://(www.)?linkedin.com/.+$"
     return link if re.match(pattern, link) else None
 
