@@ -1,7 +1,4 @@
 import asyncio
-import logging
-import sys
-
 from bot.handlers import admin_handlers
 from bot.handlers import user_handlers
 from bot.handlers import other_handlers
@@ -22,5 +19,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     asyncio.run(main())

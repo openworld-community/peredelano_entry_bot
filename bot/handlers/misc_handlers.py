@@ -1,6 +1,5 @@
-import logging
-
 from aiogram.types import Message
+
 from bot.dependencies import misc_router
 from bot.lang_ru import RU_MISC_HANDLERS
 

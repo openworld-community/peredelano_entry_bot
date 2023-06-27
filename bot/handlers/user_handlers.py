@@ -1,17 +1,15 @@
-import logging
-
 from aiogram import F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
 
-from bot.utils.buttons_factory import create_buttons, create_url_button
-from config import USERS_TABLE
 from bot.db.database import upsert_final_data_to_db, collect_initial_data_from_user
 from bot.dependencies import user_router
 from bot.fsm import UserForm
-from bot.lang_ru import RU_USER_HANDLERS, RU_COMMON_HANDLERS_BUTTONS
-from bot.utils.misc import show_dev_summary, get_linkedin_link
+from bot.lang_ru import RU_USER_HANDLERS, RU_COMMON_HANDLERS_BUTTONS, RU_MISC_HANDLERS
+from bot.utils.buttons_factory import create_buttons, create_url_button
+from bot.utils.misc import check_linkedin_link, finalize_profile
+from config import USERS_TABLE
 
 
 # START
@@ -56,24 +54,31 @@ async def choose_tech_stack(message: Message, state: FSMContext) -> None:
 
 # LinkedIn
 @user_router.message(UserForm.linkedin_profile, F.text)
-async def give_linkedin_link(message: Message, state: FSMContext) -> None:
+async def provide_linkedin_link(message: Message, state: FSMContext) -> None:
     await state.set_state(UserForm.summary)
     await state.update_data(tech_stack=message.text)
-    kb_builder = await create_buttons(RU_COMMON_HANDLERS_BUTTONS['skip_linkedin'], width=3)
+    kb_builder = await create_buttons(RU_COMMON_HANDLERS_BUTTONS['skip_linkedin'], width=1)
     await message.answer(
-        text=RU_USER_HANDLERS['give_linkedin_link'],
+        text=RU_USER_HANDLERS['provide_linkedin_link'],
         reply_markup=kb_builder.as_markup(resize_keyboard=True),
     )
 
 
-# SUMMARY
-@user_router.message(UserForm.summary, F.text)
-async def get_summary(message: Message, state: FSMContext) -> None:
-    await state.set_state(UserForm.telegram_link)
-    await state.update_data(linkedin_profile=await get_linkedin_link(message.text))
-    data = await state.get_data()
-    kb_builder = await create_buttons(["Подтвердить", "Отмена"])
-    await show_dev_summary(data, kb_builder, message)
+# SUMMARY WITH LINKEDIN
+@user_router.message(UserForm.summary, F.text, F.text.casefold() != 'пропустить')
+async def get_summary_linkedin_not_skipped(message: Message, state: FSMContext) -> None:
+    message_text_content = str(message.text)
+    if await check_linkedin_link(message_text_content):
+        await state.update_data(linkedin_profile=message_text_content)
+        await finalize_profile(message, state)
+    else:
+        await message.reply(text=RU_MISC_HANDLERS['wrong_linkedin_link'])
+
+
+# SUMMARY WITHOUT LINKEDIN
+@user_router.message(UserForm.summary, F.text, F.text.casefold() == 'пропустить')
+async def get_summary_linkedin_skipped(message: Message, state: FSMContext) -> None:
+    await finalize_profile(message, state)
 
 
 # ССЫЛКА НА КАНАЛ
