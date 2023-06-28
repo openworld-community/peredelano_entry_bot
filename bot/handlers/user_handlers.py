@@ -6,7 +6,7 @@ from aiogram.types import Message, ReplyKeyboardRemove
 from bot.db.database import upsert_final_data_to_db, collect_initial_data_from_user
 from bot.dependencies import user_router
 from bot.fsm import UserForm
-from bot.lang_ru import RU_USER_HANDLERS, RU_COMMON_HANDLERS_BUTTONS, RU_MISC_HANDLERS
+from bot.lang_ru import RU_USER_HANDLERS, RU_USER_HANDLERS_BUTTONS, RU_MISC_HANDLERS
 from bot.utils.buttons_factory import create_buttons, create_url_button
 from bot.utils.misc import check_linkedin_link, finalize_profile
 from config import USERS_TABLE
@@ -26,7 +26,7 @@ async def command_start(message: Message, state: FSMContext) -> None:
 @user_router.message(UserForm.role, F.text.casefold() == "создать профиль")
 async def get_role(message: Message, state: FSMContext) -> None:
     await state.set_state(UserForm.experience)
-    kb_builder = await create_buttons(RU_COMMON_HANDLERS_BUTTONS['roles'], width=3)
+    kb_builder = await create_buttons(RU_USER_HANDLERS_BUTTONS['roles'], width=3)
     await message.answer(
         text=RU_USER_HANDLERS['get_specialization'],
         reply_markup=kb_builder.as_markup(resize_keyboard=True), )
@@ -37,14 +37,14 @@ async def get_role(message: Message, state: FSMContext) -> None:
 async def indicate_experience(message: Message, state: FSMContext) -> None:
     await state.set_state(UserForm.tech_stack)
     await state.update_data(role=message.text)
-    kb_builder = await create_buttons(RU_COMMON_HANDLERS_BUTTONS['choose_experience'], width=3)
+    kb_builder = await create_buttons(RU_USER_HANDLERS_BUTTONS['choose_experience'], width=3)
     await message.answer(
         text=RU_USER_HANDLERS['check_experience'],
         reply_markup=kb_builder.as_markup(resize_keyboard=True), )
 
 
 # СТЕК
-@user_router.message(UserForm.tech_stack, F.text.in_({*RU_COMMON_HANDLERS_BUTTONS['choose_experience']}))
+@user_router.message(UserForm.tech_stack, F.text.in_({*RU_USER_HANDLERS_BUTTONS['choose_experience']}))
 async def choose_tech_stack(message: Message, state: FSMContext) -> None:
     await state.set_state(UserForm.linkedin_profile)
     await state.update_data(experience=message.text)
@@ -57,7 +57,7 @@ async def choose_tech_stack(message: Message, state: FSMContext) -> None:
 async def provide_linkedin_link(message: Message, state: FSMContext) -> None:
     await state.set_state(UserForm.summary)
     await state.update_data(tech_stack=message.text)
-    kb_builder = await create_buttons(RU_COMMON_HANDLERS_BUTTONS['skip_linkedin'], width=1)
+    kb_builder = await create_buttons(RU_USER_HANDLERS_BUTTONS['skip_linkedin'], width=1)
     await message.answer(
         text=RU_USER_HANDLERS['provide_linkedin_link'],
         reply_markup=kb_builder.as_markup(resize_keyboard=True),
@@ -72,7 +72,7 @@ async def get_summary_linkedin_not_skipped(message: Message, state: FSMContext) 
         await state.update_data(linkedin_profile=message_text_content)
         await finalize_profile(message, state)
     else:
-        await message.reply(text=RU_MISC_HANDLERS['wrong_linkedin_link'])
+        await message.reply(text=RU_USER_HANDLERS['wrong_linkedin_link'])
 
 
 # SUMMARY WITHOUT LINKEDIN

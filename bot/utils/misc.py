@@ -10,7 +10,7 @@ from aiogram.types import Message
 from aiogram.utils.keyboard import KeyboardBuilder, ButtonType
 
 from bot.fsm import UserForm
-from bot.lang_ru import RU_USER_HANDLERS, RU_COMMON_HANDLERS_BUTTONS
+from bot.lang_ru import RU_USER_HANDLERS, RU_USER_HANDLERS_BUTTONS
 from bot.utils.buttons_factory import create_buttons
 
 
@@ -58,5 +58,5 @@ async def check_linkedin_link(message: str) -> bool:
 async def finalize_profile(message: Message, state: FSMContext) -> None:
     await state.set_state(UserForm.telegram_link)
     data = await state.get_data()
-    kb_builder = await create_buttons(RU_COMMON_HANDLERS_BUTTONS['finalize_profile'])
+    kb_builder = await create_buttons(RU_USER_HANDLERS_BUTTONS['finalize_profile'])
     await show_dev_summary(data, kb_builder, message)
