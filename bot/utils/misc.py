@@ -55,7 +55,7 @@ async def check_linkedin_link(message: str) -> bool:
     return True if re.match(pattern, message) else False
 
 
-async def finalize_profile(message: Message, state: FSMContext):
+async def finalize_profile(message: Message, state: FSMContext) -> None:
     await state.set_state(UserForm.telegram_link)
     data = await state.get_data()
     kb_builder = await create_buttons(RU_COMMON_HANDLERS_BUTTONS['finalize_profile'])
