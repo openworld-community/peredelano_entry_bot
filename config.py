@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from environs import Env
 
+
 @dataclass
 class TgBot:
     bot_token: str
@@ -20,14 +21,15 @@ class Config:
 def load_config(path: str | None = None) -> Config:
     env = Env()
     env.read_env(path)
-    return Config(tg_bot=TgBot(bot_token=env('BOT_TOKEN'),
-                               supabase_url=env('SUPABASE_URL'),
-                               supabase_key=env('SUPABASE_KEY'),
-                               supabase_users_table=env('SUPABASE_USERS_TABLE'),
-                               supabase_mailing_table=env('SUPABASE_MAILING_TABLE'),
-                               admins_list=list(map(int, env.list("ADMINS"))),
+    return Config(tg_bot=TgBot(bot_token=env.str('BOT_TOKEN'),
+                               supabase_url=env.str('SUPABASE_URL'),
+                               supabase_key=env.str('SUPABASE_KEY'),
+                               supabase_users_table=env.str('SUPABASE_USERS_TABLE'),
+                               supabase_mailing_table=env.str('SUPABASE_MAILING_TABLE'),
+                               admins_list=env.list("ADMINS", subcast=int),
                                )
                   )
+
 
 config: Config = load_config('.env')
 USERS_TABLE = config.tg_bot.supabase_users_table
