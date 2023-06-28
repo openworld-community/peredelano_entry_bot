@@ -5,6 +5,7 @@ class UserForm(StatesGroup):
     role = State()
     experience = State()
     tech_stack = State()
+    linkedin_profile = State()
     summary = State()
     telegram_link = State()
 

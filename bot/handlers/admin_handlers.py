@@ -4,7 +4,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
 from loguru import logger
 
-from config import config
 from bot.db.database import get_all_tg_ids, insert_mailing_message_to_db
 from bot.dependencies import admin_router
 from bot.fsm import AdminForm
@@ -12,6 +11,7 @@ from bot.lang_ru import RU_ADMIN_HANDLERS
 from bot.utils.buttons_factory import create_buttons
 from bot.utils.mailing_list import select_profiles_for_mailing, start_mailing, mailing_list_summary, \
     show_mailing_summary
+from config import config
 
 
 # ADMIN START

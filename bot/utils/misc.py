@@ -1,12 +1,17 @@
 import asyncio
+import re
 import sys
 import time
 from datetime import datetime
 
 import pytz
+from aiogram.fsm.context import FSMContext
+from aiogram.types import Message
 from aiogram.utils.keyboard import KeyboardBuilder, ButtonType
 
-from bot.lang_ru import RU_USER_HANDLERS
+from bot.fsm import UserForm
+from bot.lang_ru import RU_USER_HANDLERS, RU_COMMON_HANDLERS_BUTTONS
+from bot.utils.buttons_factory import create_buttons
 
 
 def check_eventloop_policy() -> None:
@@ -17,10 +22,10 @@ def check_eventloop_policy() -> None:
 async def show_dev_summary(data: dict, kb_builder: KeyboardBuilder[ButtonType], message) -> None:
     await message.answer(
         text=f'{RU_USER_HANDLERS["summary"]}'
-
              f'Роль: {data.get("role", "Данные не получены")}\n'
              f'Опыт: {data.get("experience", "Данные не получены")}\n'
-             f'Стек: {data.get("tech_stack", "Данные не получены")}',
+             f'Стек: {data.get("tech_stack", "Данные не получены")}\n'
+             f'LinkedIn: {data.get("linkedin_profile", "Данные не получены")}',
         reply_markup=kb_builder.as_markup(resize_keyboard=True), )
 
 
@@ -45,5 +50,13 @@ async def get_datetime() -> tuple[str, int]:
     return formatted_timestamptz, start_time
 
 
-def check_string(input_string):
-    return True
+async def check_linkedin_link(message: str) -> bool:
+    pattern = re.compile(r'^https://(www.)?linkedin.com/.+$')
+    return True if re.match(pattern, message) else False
+
+
+async def finalize_profile(message: Message, state: FSMContext) -> None:
+    await state.set_state(UserForm.telegram_link)
+    data = await state.get_data()
+    kb_builder = await create_buttons(RU_COMMON_HANDLERS_BUTTONS['finalize_profile'])
+    await show_dev_summary(data, kb_builder, message)
