@@ -24,7 +24,7 @@ async def command_start(message: Message, state: FSMContext) -> None:
                          reply_markup=kb_builder.as_markup(resize_keyboard=True), )
 
 
-# РОЛЬ
+# ROLES
 @user_router.message(UserForm.role, F.text.casefold() == "создать профиль")
 async def get_role(message: Message, state: FSMContext) -> None:
     await state.set_state(UserForm.experience)
@@ -34,7 +34,7 @@ async def get_role(message: Message, state: FSMContext) -> None:
         reply_markup=kb_builder.as_markup(resize_keyboard=True), )
 
 
-# ОПЫТ
+# EXPERIENCE
 @user_router.message(UserForm.experience, F.text)
 async def indicate_experience(message: Message, state: FSMContext) -> None:
     await state.set_state(UserForm.tech_stack)
@@ -45,7 +45,7 @@ async def indicate_experience(message: Message, state: FSMContext) -> None:
         reply_markup=kb_builder.as_markup(resize_keyboard=True), )
 
 
-# СТЕК
+# STACK
 @user_router.message(UserForm.tech_stack, F.text.in_({*RU_COMMON_HANDLERS_BUTTONS['choose_experience']}))
 async def choose_tech_stack(message: Message, state: FSMContext) -> None:
     await state.set_state(UserForm.summary)
@@ -64,14 +64,14 @@ async def get_summary(message: Message, state: FSMContext) -> None:
     await show_dev_summary(data, kb_builder, message)
 
 
-# ССЫЛКА НА КАНАЛ
+# LINK TO TELEGRAM GROUP
 @user_router.message(UserForm.telegram_link, F.text.casefold() == "подтвердить")
 async def finish(message: Message, state: FSMContext) -> None:
     await message.answer('Спасибо, что заполнил профиль!', reply_markup=ReplyKeyboardRemove(remove_keyboard=True))
     await state.update_data(submit='yes')
 
-    kb_builder = await create_url_button("Peredelano Startups", "https://t.me/peredelanoconfjunior")
-    await message.answer("Вот ссылка на наш Telegram-канал",
+    kb_builder = await create_url_button("Peredelano Community", "https://t.me/peredelanoconfjunior")
+    await message.answer("Нажимай на кнопку чтобы присоединиться к нашей группе.",
                          reply_markup=kb_builder.as_markup(resize_keyboard=True), )
     await upsert_final_data_to_db(state, USERS_TABLE)
     await state.clear()
