@@ -2,13 +2,15 @@ import asyncio
 import re
 import sys
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytz
+from aiogram.dispatcher.dispatcher import MemoryStorage
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from aiogram.utils.keyboard import KeyboardBuilder, ButtonType
 
+from bot.dependencies import bot
 from bot.fsm import UserForm
 from bot.lang_ru import RU_USER_HANDLERS, RU_USER_HANDLERS_BUTTONS
 from bot.utils.buttons_factory import create_buttons
@@ -60,3 +62,16 @@ async def finalize_profile(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
     kb_builder = await create_buttons(RU_USER_HANDLERS_BUTTONS['finalize_profile'])
     await show_dev_summary(data, kb_builder, message)
+
+
+async def check_storage_old(storage: MemoryStorage):
+    current_time, _ = await get_datetime()
+
+    for key, value in storage.storage.items():
+        date_str = value.data.get('date')
+        if date_str:
+            date = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S %Z')
+            time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S %Z') - date
+            if time_difference >= timedelta(days=7):
+                await storage.set_data(bot=bot, key=key, data={'data': {}})
+                await storage.set_state(bot=bot, key=key, state=None)
