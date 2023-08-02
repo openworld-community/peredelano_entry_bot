@@ -2,7 +2,7 @@
 FROM python:3.10-slim AS builder
 
 RUN apt-get update -y; \
-    apt-get install -y nginx; \
+    apt-get install -y nginx --no-install-recommends; \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 
