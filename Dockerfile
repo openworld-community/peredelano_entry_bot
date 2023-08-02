@@ -2,7 +2,6 @@
 FROM python:3.10-slim AS builder
 
 RUN apt-get update -y; \
-    apt-get install -y nginx --no-install-recommends; \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 
@@ -24,5 +23,5 @@ COPY . .
 EXPOSE 80
 
 STOPSIGNAL SIGQUIT
-CMD ["/bin/bash", "-c", "nginx -g 'daemon off;';python run.py"]
+CMD ["python", "run.py"]
 
