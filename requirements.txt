@@ -1,8 +1,9 @@
-﻿aiogram==3.0.0b7
+aiogram==3.0.0b7
 environs==9.5.0
 pytz==2023.3
 supabase==1.0.3
 loguru==0.7.0
+apscheduler==3.10.1
 pytest~=7.4.0
 pytest-asyncio~=0.21.0
 aiogram-tests~=1.0.3

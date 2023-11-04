@@ -1,4 +1,5 @@
 from aiogram import Router, Bot, Dispatcher
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from supabase import Client, create_client
 
 from config import config
@@ -14,3 +15,5 @@ bot: Bot = Bot(token=config.tg_bot.bot_token, parse_mode="HTML")
 dp: Dispatcher = Dispatcher()
 
 sb: Client = create_client(config.tg_bot.supabase_url, config.tg_bot.supabase_key)
+
+scheduler = AsyncIOScheduler()
